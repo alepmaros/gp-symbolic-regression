@@ -37,7 +37,9 @@ if __name__ == '__main__':
     else:
         exit('Invalid Dataset')
 
-    gp = GeneticProgramming(train, test,
-                            args.generations,
-                            args.crossover_probability
-                            args.max_tree_depth)
+    for (i in range(0, args.runs)):
+        gp = GeneticProgramming(train, test,
+                                args.generations,
+                                args.crossover_probability
+                                args.max_tree_depth)
+        scores = gp.run()

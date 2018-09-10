@@ -28,9 +28,17 @@ class GeneticProgramming:
         return
     
     def run(self):
+        scores = {
+            'Train': [],
+            'Test': []
+        }
+
         self.population = _init_population()
 
         for i in range(0, self.nb_generations):
             print(i)
 
         # Fitness
+
+        # Returns fitness of every individual at generation i for train and test set
+        return scores
