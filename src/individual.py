@@ -1,7 +1,6 @@
-from tree import Tree
+from src.tree import Tree
 
 class Individual:
-    self.tree = Tree()
-
     def __init__():
+        self.tree = Tree()
         print('Hi')

@@ -1,6 +1,6 @@
 
 
-from individual import Individual
+from src.individual import Individual
 
 class GeneticProgramming:
     def __init__(self, train, test, nb_generations, p_crossover, max_tree_depth):
@@ -21,7 +21,7 @@ class GeneticProgramming:
         return
     
     ## TO-DO: Check this one out
-    def _reproduction(self, ind1, ind2)
+    def _reproduction(self, ind1, ind2):
         return 
 
     def _mutation(self, ind1):
@@ -33,7 +33,7 @@ class GeneticProgramming:
             'Test': []
         }
 
-        self.population = _init_population()
+        self.population = self._init_population()
 
         for i in range(0, self.nb_generations):
             print(i)

@@ -111,17 +111,20 @@ class Variable(Node):
         self.value = val
 
     def eval(self, X):
-        return X[self.value]
+        return X[:,self.value]
 
     def __str__(self):
         return 'X[{}]'.format(self.value)
 
+
+X = np.array([[1, 2, 3], [3, 4, 5], [6, 7, 8]])
+
 a = Sum()
-a.left = Sum()
+a.left = Multiply()
 a.left.left = Variable(0)
 a.left.right = Terminal(2)
 a.right = Variable(1)
 t = Tree()
 t.setRoot(a)
-print(t.evalTree([150,200]))
+print(t.evalTree(X))
 print(t)
