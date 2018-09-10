@@ -1,6 +1,7 @@
 
 
 from src.individual import Individual
+from src import tree
 
 class GeneticProgramming:
     def __init__(self, train, test, nb_generations, p_crossover, max_tree_depth):
@@ -10,6 +11,11 @@ class GeneticProgramming:
         self.max_tree_depth = max_tree_depth
         self.p_crossover    = p_crossover
         self.p_mutation     = 1 - p_crossover
+
+        available_nodes = [
+            tree.Sum, tree.Division, tree.Subtraction, tree.Multiply],
+            tree.Value, tree.Variable]
+        ]
 
     def _init_population(self):
         return []

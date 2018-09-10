@@ -1,3 +1,6 @@
+import numpy as np
+import random
+
 #########################
 # BASE CLASSES          #
 #########################
@@ -34,6 +37,7 @@ class Tree:
 
 class Function(Node):
     def __init__(self):
+        super().__init__()
         self.type = 'Function'
 
 class Sum(Function):
@@ -53,7 +57,7 @@ class Multiply(Function):
     def __init__(self):
         super().__init__()
 
-    def eval(self):
+    def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Multiply')
         
@@ -66,7 +70,7 @@ class Subtraction(Function):
     def __init__(self):
         super().__init__()
 
-    def eval(self):
+    def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Subtraction')
         
@@ -79,7 +83,7 @@ class Division(Function):
     def __init__(self):
         super().__init__()
 
-    def eval(self):
+    def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Division')
         
@@ -93,9 +97,15 @@ class Division(Function):
 #########################
 
 class Terminal(Node):
-    def __init__(self, val):
+
+    def __init__(self):
         super().__init__()
-        self.value = val
+        self.type = 'Terminal'
+
+class Value(Node):
+    def __init__(self):
+        super().__init__()
+        self.value = random.uniform(-5, 5)
 
     def eval(self, X):
         return self.value
@@ -108,7 +118,7 @@ class Variable(Node):
         super().__init__()
 
         # Value here represents the i position of the X vector
-        self.value = val
+        self.value = random.randint(0, len(X[0])-2)
 
     def eval(self, X):
         return X[:,self.value]
@@ -116,15 +126,14 @@ class Variable(Node):
     def __str__(self):
         return 'X[{}]'.format(self.value)
 
+# X = np.array([[1, 2, 3], [3, 4, 5], [6, 7, 8]])
 
-X = np.array([[1, 2, 3], [3, 4, 5], [6, 7, 8]])
-
-a = Sum()
-a.left = Multiply()
-a.left.left = Variable(0)
-a.left.right = Terminal(2)
-a.right = Variable(1)
-t = Tree()
-t.setRoot(a)
-print(t.evalTree(X))
-print(t)
+# a = Sum()
+# a.left = Multiply()
+# a.left.left = Variable(0)
+# a.left.right = Value(2)
+# a.right = Variable(1)
+# t = Tree()
+# t.setRoot(a)
+# print(t.evalTree(X))
+# print(t)

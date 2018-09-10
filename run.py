@@ -18,7 +18,6 @@ if __name__ == '__main__':
                         help='Crossover probability (mutation will be 1-p)')
 
     args = parser.parse_args()
-    print(args)
 
     synth1_train = 'datasets/synth1/synth1-test.csv'
     synth1_test  = 'datasets/synth1/synth1-train.csv'
@@ -37,8 +36,6 @@ if __name__ == '__main__':
         train, test = read_dataset(concrete_train, concrete_test)
     else:
         exit('Invalid Dataset')
-
-    print(train.T.shape)
 
     for i in range(0, args.runs):
         gp = GeneticProgramming(train, test,
