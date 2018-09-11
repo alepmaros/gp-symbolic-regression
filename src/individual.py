@@ -8,6 +8,7 @@ class Individual:
         self.tree       = tree.Tree()
         self.max_depth  = max_depth
         self.n_features = n_features
+        self.fitness    = None
 
     def predict(self, X):
         y_pred = self.tree.evalTree(X)
@@ -17,54 +18,54 @@ class Individual:
     # Methods of Creating New Individuals   #
     #########################################
 
-    def _grow(self, node, depth, node_list, rgenerator):
+    def _grow(self, node, depth, node_list, rng):
         # If reached max depth, fill it with terminals
         if (depth >= self.max_depth):
-            r = rgenerator.randint(0, len(node_list['terminals']))
-            node = node_list['terminals'][r](self.n_features, rgenerator)
+            r = rng.randint(0, len(node_list['terminals']))
+            node = node_list['terminals'][r](node, self.n_features, rng)
             return node
 
         # If still hasnt reached max depth, keep expanding it
-        r = rgenerator.randint(0, len(node_list['all']))
-        node = node_list['all'][r](self.n_features, rgenerator)
+        r = rng.randint(0, len(node_list['all']))
+        node = node_list['all'][r](node, self.n_features, rng)
         if (node.type == 'Function'):
-            node.left  = self._grow(node.left, depth+1, node_list, rgenerator)
-            node.right = self._grow(node.right, depth+1, node_list, rgenerator)
+            node.left  = self._grow(node.left, depth+1, node_list, rng)
+            node.right = self._grow(node.right, depth+1, node_list, rng)
         return node
 
-    def grow(self, node_list, rgenerator):
+    def grow(self, node_list, rng):
         
         # Choose a random Node to be added to the tree
-        r = rgenerator.randint(0, len(node_list['all']))
+        r = rng.randint(0, len(node_list['all']))
 
         # Set the root of the tree to be that node
-        self.tree.root = node_list['all'][r](self.n_features, rgenerator)
+        self.tree.root = node_list['all'][r](None, self.n_features, rng)
 
         # If the node is a function, you still need to expand it
         if (self.tree.root.type == 'Function'):
-            self.tree.root.left  = self._grow(self.tree.root.left, 1, node_list, rgenerator)
-            self.tree.root.right = self._grow(self.tree.root.right, 1, node_list, rgenerator)
+            self.tree.root.left  = self._grow(self.tree.root.left, 1, node_list, rng)
+            self.tree.root.right = self._grow(self.tree.root.right, 1, node_list, rng)
 
-    def _full(self, node, depth, node_list, rgenerator):
+    def _full(self, node, depth, node_list, rng):
         # If reached max depth, fill it with terminals
         if (depth >= self.max_depth):
-            r = rgenerator.randint(0, len(node_list['terminals']))
-            node = node_list['terminals'][r](self.n_features, rgenerator)
+            r = rng.randint(0, len(node_list['terminals']))
+            node = node_list['terminals'][r](node, self.n_features, rng)
             return node
 
         # If still hasnt reached max depth, keep expanding with functions
-        r = rgenerator.randint(0, len(node_list['functions']))
-        node = node_list['functions'][r](self.n_features, rgenerator)
-        node.left  = self._full(node.left, depth+1, node_list, rgenerator)
-        node.right = self._full(node.right, depth+1, node_list, rgenerator)
+        r = rng.randint(0, len(node_list['functions']))
+        node = node_list['functions'][r](node, self.n_features, rng)
+        node.left  = self._full(node.left, depth+1, node_list, rng)
+        node.right = self._full(node.right, depth+1, node_list, rng)
         return node
 
-    def full(self, node_list, rgenerator):
+    def full(self, node_list, rng):
         # Choose a random Function to be added to the tree
-        r = rgenerator.randint(0, len(node_list['functions']))
-        self.tree.root = node_list['functions'][r](self.n_features, rgenerator)
-        self.tree.root.left  = self._full(self.tree.root.left, 1, node_list, rgenerator)
-        self.tree.root.right = self._full(self.tree.root.right, 1, node_list, rgenerator)
+        r = rng.randint(0, len(node_list['functions']))
+        self.tree.root = node_list['functions'][r](None, self.n_features, rng)
+        self.tree.root.left  = self._full(self.tree.root.left, 1, node_list, rng)
+        self.tree.root.right = self._full(self.tree.root.right, 1, node_list, rng)
 
 
 # node_list = {
@@ -73,12 +74,12 @@ class Individual:
 #     'terminals': [ tree.Value, tree.Variable ]
 # }
 
-# rgenerator = np.random.RandomState(seed=2)
+# rng = np.random.RandomState(seed=2)
 # i = Individual(max_depth=7, n_features=4)
-# i.grow(node_list, rgenerator)
+# i.grow(node_list, rng)
 # print(i.tree)
 
 # print('-----')
 
-# i.full(node_list, rgenerator)
+# i.full(node_list, rng)
 # print(i.tree)

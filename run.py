@@ -16,10 +16,12 @@ if __name__ == '__main__':
                         help='Number of generations')
     parser.add_argument('--max-tree-depth', type=int, default=7,
                         help='The maximum depth of the function tree')
-    parser.add_argument('--crossover-probability', '-c', type=float, default=0.9,
+    parser.add_argument('--crossover-probability', '-c', type=float, default=0.95,
                         help='Crossover probability (mutation will be 1-p)')
     parser.add_argument('--individuals', '-i', type=int, default=50,
                         help='The number of individuals per generation')
+    parser.add_argument('--tournament-size', type=int, default=10,
+                        help='How many individuals will be selected in the tournament')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')
 
@@ -52,5 +54,6 @@ if __name__ == '__main__':
                                 args.generations,
                                 args.crossover_probability,
                                 args.max_tree_depth,
+                                args.tournament_size,
                                 rgenerator)
         scores = gp.run()

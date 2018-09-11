@@ -10,6 +10,7 @@ class Node:
         self.left  = None
         self.right = None
         self.value = None
+        self.parent = None
 
     def eval(self, X):
         raise NotImplementedError
@@ -36,14 +37,15 @@ class Tree:
 #########################
 
 class Function(Node):
-    def __init__(self, n_features):
+    def __init__(self, parent, n_features):
         super().__init__()
         self.type = 'Function'
         self.n_features = n_features
+        self.parent = parent
 
 class Sum(Function):
-    def __init__(self, n_features, rgenerator):
-        super().__init__(n_features)
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -55,8 +57,8 @@ class Sum(Function):
         return '(+ {} {})'.format(self.left.__str__(), self.right.__str__())
 
 class Multiply(Function):
-    def __init__(self, n_features, rgenerator):
-        super().__init__(n_features)
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -68,23 +70,21 @@ class Multiply(Function):
         return '(* {} {})'.format(self.left.__str__(), self.right.__str__())
 
 class Subtraction(Function):
-    def __init__(self, n_features, rgenerator):
-        super().__init__(n_features)
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Subtraction')
         
-        # print(self.left.eval(X))
-        # print(self.right.eval(X))
         return np.subtract(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
         return '(- {} {})'.format(self.left.__str__(), self.right.__str__())
         
 class Division(Function):
-    def __init__(self, n_features, rgenerator):
-        super().__init__(n_features)
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -105,15 +105,16 @@ class Division(Function):
 
 class Terminal(Node):
 
-    def __init__(self, n_features):
+    def __init__(self, parent, n_features):
         super().__init__()
         self.type = 'Terminal'
         self.n_features = n_features
+        self.parent = parent
 
 class Value(Terminal):
-    def __init__(self, n_features, rgenerator):
-        super().__init__(n_features)
-        self.value = round(rgenerator.uniform(-1, 1), 3)
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features)
+        self.value = round(rng.uniform(-1, 1), 3)
 
     def eval(self, X):
         return np.repeat(self.value, X.shape[0])
@@ -122,10 +123,10 @@ class Value(Terminal):
         return str(self.value)
 
 class Variable(Terminal):
-    def __init__(self, n_features, rgenerator):
-        super().__init__(n_features)
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features)
         # Value here represents the i position of the X vector
-        self.value = rgenerator.randint(0, n_features)
+        self.value = rng.randint(0, n_features)
 
     def eval(self, X):
         return X[:,self.value]
