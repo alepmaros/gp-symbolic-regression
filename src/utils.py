@@ -11,9 +11,9 @@ def read_dataset(train_path, test_path):
     test = []
 
     with open(train_path, 'r') as csvfile:
-        train = np.array(list(csv.reader(csvfile)))
+        train = np.array(list(csv.reader(csvfile)), dtype=np.float64)
     
     with open(test_path, 'r') as csvfile:
-        test = np.array(list(csv.reader(csvfile)))
+        test = np.array(list(csv.reader(csvfile)), dtype=np.float64)
     
     return train, test

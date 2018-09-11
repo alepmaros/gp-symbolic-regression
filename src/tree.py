@@ -42,53 +42,59 @@ class Function(Node):
         self.n_features = n_features
 
 class Sum(Function):
-    def __init__(self, n_features):
+    def __init__(self, n_features, rgenerator):
         super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Sum')
         
-        return self.left.eval(X) + self.right.eval(X)
+        return np.add(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
         return '(+ {} {})'.format(self.left.__str__(), self.right.__str__())
 
 class Multiply(Function):
-    def __init__(self, n_features):
+    def __init__(self, n_features, rgenerator):
         super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Multiply')
-        
-        return self.left.eval(X) * self.right.eval(X)
+
+        return np.multiply(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
         return '(* {} {})'.format(self.left.__str__(), self.right.__str__())
 
 class Subtraction(Function):
-    def __init__(self, n_features):
+    def __init__(self, n_features, rgenerator):
         super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Subtraction')
         
-        return self.left.eval(X) - self.right.eval(X)
+        # print(self.left.eval(X))
+        # print(self.right.eval(X))
+        return np.subtract(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
         return '(- {} {})'.format(self.left.__str__(), self.right.__str__())
         
 class Division(Function):
-    def __init__(self, n_features):
+    def __init__(self, n_features, rgenerator):
         super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
             raise Exception('Left or Right value not set for Division')
         
-        return self.left.eval(X) / self.right.eval(X)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            result = np.true_divide(self.left.eval(X), self.right.eval(X))
+            result[result == np.inf] = 0
+            result = np.nan_to_num(result)
+            return result
 
     def __str__(self):
         return '(/ {} {})'.format(self.left.__str__(), self.right.__str__())
@@ -105,22 +111,21 @@ class Terminal(Node):
         self.n_features = n_features
 
 class Value(Terminal):
-    def __init__(self, n_features):
+    def __init__(self, n_features, rgenerator):
         super().__init__(n_features)
-        self.value = round(random.uniform(-5, 5), 3)
+        self.value = round(rgenerator.uniform(-1, 1), 3)
 
     def eval(self, X):
-        return self.value
-
+        return np.repeat(self.value, X.shape[0])
+        
     def __str__(self):
         return str(self.value)
 
 class Variable(Terminal):
-    def __init__(self, n_features):
+    def __init__(self, n_features, rgenerator):
         super().__init__(n_features)
-
         # Value here represents the i position of the X vector
-        self.value = random.randint(0, n_features-1)
+        self.value = rgenerator.randint(0, n_features)
 
     def eval(self, X):
         return X[:,self.value]

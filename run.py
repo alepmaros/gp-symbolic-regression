@@ -1,4 +1,6 @@
-import os, argparse, sys
+import os, argparse, sys, random
+
+import numpy as np
 
 from src.utils import read_dataset
 from src.gp    import GeneticProgramming
@@ -18,11 +20,14 @@ if __name__ == '__main__':
                         help='Crossover probability (mutation will be 1-p)')
     parser.add_argument('--individuals', '-i', type=int, default=50,
                         help='The number of individuals per generation')
+    parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
+                        help='The seed for the random number generator')
 
     args = parser.parse_args()
+    print(args)
 
-    synth1_train = 'datasets/synth1/synth1-test.csv'
-    synth1_test  = 'datasets/synth1/synth1-train.csv'
+    synth1_train = 'datasets/synth1/synth1-train.csv'
+    synth1_test  = 'datasets/synth1/synth1-test.csv'
     synth2_train = 'datasets/synth2/synth2-train.csv'
     synth2_test  = 'datasets/synth2/synth2-test.csv'
     concrete_train = 'datasets/concrete/concrete-train.csv'
@@ -39,10 +44,13 @@ if __name__ == '__main__':
     else:
         exit('Invalid Dataset')
 
+    rgenerator = np.random.RandomState(seed=args.random_seed)
+
     for i in range(0, args.runs):
         gp = GeneticProgramming(train, test,
                                 args.individuals,
                                 args.generations,
                                 args.crossover_probability,
-                                args.max_tree_depth)
+                                args.max_tree_depth,
+                                rgenerator)
         scores = gp.run()
