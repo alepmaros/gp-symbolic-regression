@@ -1,6 +1,6 @@
 import itertools, random
 
-import tree
+from src import tree
 
 class Individual:
     def __init__(self, max_depth=7, n_features=2):
@@ -62,11 +62,11 @@ class Individual:
         self.tree.root.right = self._full(self.tree.root.right, 1, node_list)
 
 
-node_list = {
-    'all': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply, tree.Value, tree.Variable ],
-    'functions': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply ],
-    'terminals': [ tree.Value, tree.Variable ]
-}
+# node_list = {
+#     'all': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply, tree.Value, tree.Variable ],
+#     'functions': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply ],
+#     'terminals': [ tree.Value, tree.Variable ]
+# }
 
 # i = Individual(max_depth=7, n_features=4)
 # i.grow(node_list)

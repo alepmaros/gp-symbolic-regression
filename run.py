@@ -12,10 +12,12 @@ if __name__ == '__main__':
                         help='Number of runs to calculate mean and std')
     parser.add_argument('--generations', '-g', type=int, default=50,
                         help='Number of generations')
-    parser.add_argument('--max-tree-depth', type=int, default=20,
+    parser.add_argument('--max-tree-depth', type=int, default=7,
                         help='The maximum depth of the function tree')
     parser.add_argument('--crossover-probability', '-c', type=float, default=0.9,
                         help='Crossover probability (mutation will be 1-p)')
+    parser.add_argument('--individuals', '-i', type=int, default=50,
+                        help='The number of individuals per generation')
 
     args = parser.parse_args()
 
@@ -39,7 +41,8 @@ if __name__ == '__main__':
 
     for i in range(0, args.runs):
         gp = GeneticProgramming(train, test,
+                                args.individuals,
                                 args.generations,
                                 args.crossover_probability,
                                 args.max_tree_depth)
-        #scores = gp.run()
+        scores = gp.run()
