@@ -1,5 +1,3 @@
-
-
 from src.individual import Individual
 from src import tree
 
@@ -12,10 +10,7 @@ class GeneticProgramming:
         self.p_crossover    = p_crossover
         self.p_mutation     = 1 - p_crossover
 
-        available_nodes = [
-            tree.Sum, tree.Division, tree.Subtraction, tree.Multiply],
-            tree.Value, tree.Variable]
-        ]
+        available_nodes = [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply, tree.Value, tree.Variable ]
 
     def _init_population(self):
         return []

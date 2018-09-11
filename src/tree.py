@@ -36,13 +36,14 @@ class Tree:
 #########################
 
 class Function(Node):
-    def __init__(self):
+    def __init__(self, n_features):
         super().__init__()
         self.type = 'Function'
+        self.n_features = n_features
 
 class Sum(Function):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, n_features):
+        super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -54,8 +55,8 @@ class Sum(Function):
         return '(+ {} {})'.format(self.left.__str__(), self.right.__str__())
 
 class Multiply(Function):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, n_features):
+        super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -67,8 +68,8 @@ class Multiply(Function):
         return '(* {} {})'.format(self.left.__str__(), self.right.__str__())
 
 class Subtraction(Function):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, n_features):
+        super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -80,8 +81,8 @@ class Subtraction(Function):
         return '(- {} {})'.format(self.left.__str__(), self.right.__str__())
         
 class Division(Function):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, n_features):
+        super().__init__(n_features)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -98,14 +99,15 @@ class Division(Function):
 
 class Terminal(Node):
 
-    def __init__(self):
+    def __init__(self, n_features):
         super().__init__()
         self.type = 'Terminal'
+        self.n_features = n_features
 
-class Value(Node):
-    def __init__(self):
-        super().__init__()
-        self.value = random.uniform(-5, 5)
+class Value(Terminal):
+    def __init__(self, n_features):
+        super().__init__(n_features)
+        self.value = round(random.uniform(-5, 5), 3)
 
     def eval(self, X):
         return self.value
@@ -113,12 +115,12 @@ class Value(Node):
     def __str__(self):
         return str(self.value)
 
-class Variable(Node):
-    def __init__(self, val):
-        super().__init__()
+class Variable(Terminal):
+    def __init__(self, n_features):
+        super().__init__(n_features)
 
         # Value here represents the i position of the X vector
-        self.value = random.randint(0, len(X[0])-2)
+        self.value = random.randint(0, n_features-1)
 
     def eval(self, X):
         return X[:,self.value]
