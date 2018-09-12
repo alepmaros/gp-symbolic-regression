@@ -20,7 +20,7 @@ if __name__ == '__main__':
                         help='Crossover probability (mutation will be 1-p)')
     parser.add_argument('--individuals', '-i', type=int, default=50,
                         help='The number of individuals per generation')
-    parser.add_argument('--tournament-size', type=int, default=10,
+    parser.add_argument('--tournament-size', type=int, default=25,
                         help='How many individuals will be selected in the tournament')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')

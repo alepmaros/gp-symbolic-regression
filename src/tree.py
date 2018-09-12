@@ -32,6 +32,23 @@ class Tree:
         if(self.root != None):
             return self.root.__str__()
 
+    def _getListOfNodes(self, node_list, node, position):
+        if (node == None):
+            return
+
+        node_list.append( (position, node) )
+        self._getListOfNodes(node_list, node.left, 'left')
+        self._getListOfNodes(node_list, node.right, 'right')
+
+
+    def getListOfNodes(self):
+        node_list = []
+
+        self._getListOfNodes(node_list, self.root.left, 'left')
+        self._getListOfNodes(node_list, self.root.right, 'right')
+
+        return node_list
+
 #########################
 # FUNCTIONS             #
 #########################
@@ -62,8 +79,9 @@ class Multiply(Function):
 
     def eval(self, X):
         if (self.left == None or self.right == None):
+            print(self.parent)
             raise Exception('Left or Right value not set for Multiply')
-
+        
         return np.multiply(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
