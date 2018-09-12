@@ -132,8 +132,8 @@ class Division(Function):
         
         with np.errstate(divide='ignore', invalid='ignore'):
             result = np.true_divide(self.left.eval(X), self.right.eval(X))
-            result[result == np.inf] = 0
-            result = np.nan_to_num(result)
+            result[np.isinf(result)] = 1
+            result[np.isnan(result)] = 1
             return result
 
     def __str__(self):

@@ -1,4 +1,4 @@
-import math, copy
+import math, copy, time
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -35,12 +35,12 @@ class GeneticProgramming:
         population = []
 
         # Create 1/2 using Grow and 1/2 using Full
-        for i in range(0, math.ceil(self.nb_individuals / 2)):
+        for i in range(0, math.ceil(self.nb_individuals * 0.8)):
             i = Individual(self.max_tree_depth, self.n_features)
             i.grow(self.node_list, self.rng)
             population.append(i)
         
-        for i in range(0, math.floor(self.nb_individuals / 2)):
+        for i in range(0, math.floor(self.nb_individuals * 0.2)):
             i = Individual(self.max_tree_depth, self.n_features)
             i.full(self.node_list, self.rng)
             population.append(i)
@@ -60,31 +60,29 @@ class GeneticProgramming:
         selected_individuals.sort(key=lambda x: x.fitness)
         # Select the best (lowest)
         return selected_individuals[0]
+
+    def _swap_nodes(self, ind1, ind2):
+        
+        if ind2.parent.left == ind2:
+            ind2.parent.left = ind1
+        else:
+            ind2.parent.right = ind1   
+        ind1.parent = ind2.parent
     
     def _crossover(self, ind1, ind2):
         son1 = copy.deepcopy(ind1)
         son2 = copy.deepcopy(ind2)
+        son1.fitness = None
+        son2.fitness = None
 
         random_node_1 = son1.select_random_node(self.rng)
         random_node_2 = son2.select_random_node(self.rng)
 
-        parent_rn1 = random_node_1['node'].parent
-        parent_rn2 = random_node_2['node'].parent
-
         if (random_node_1['cur_depth'] + random_node_2['node_depth'] <= self.max_tree_depth):
-            if (random_node_1['position'] == 'left'):
-                parent_rn1.left = random_node_2['node']
-            else:
-                parent_rn1.right = random_node_2['node']
+            self._swap_nodes( copy.deepcopy(random_node_2['node']), random_node_1['node'] )
 
         if (random_node_2['cur_depth'] + random_node_1['node_depth'] <= self.max_tree_depth):
-            if (random_node_2['position'] == 'left'):
-                parent_rn2.left = random_node_1['node']
-            else:
-                parent_rn2.right = random_node_1['node']
-
-        random_node_1['node'].parent = parent_rn2
-        random_node_2['node'].parent = parent_rn1
+            self._swap_nodes( copy.deepcopy(random_node_1['node']), random_node_2['node'] )
 
         return son1, son2
 
@@ -125,18 +123,11 @@ class GeneticProgramming:
         return new_individual
 
     def _fitness(self, population):
-        # TO DO FIX THIS FOR NORMALIZED VERSION
         normalization = np.sum( np.power(self.y_train - np.mean(self.y_train), 2))
-        # normalization = len(self.y_train)
-
         for p in population:
             y_pred = p.predict(self.X_train)
-            error_squared = np.sum(np.power(self.y_train - y_pred, 2))
-            fitness_p = np.sqrt( error_squared / normalization )
-            # TO-DO Check this one
-            if (np.isinf(fitness_p)):
-                fitness_p = 99999999
-            p.fitness = fitness_p
+            error = np.sqrt(np.sum(np.power(self.y_train - y_pred, 2)) / normalization)
+            p.fitness = error
 
     def run(self):
         scores = {
@@ -151,7 +142,6 @@ class GeneticProgramming:
         for i in range(0, self.nb_generations):
             if (i % 10 == 0):
                 print('Generation', i)
-                print(len(population))
             new_population = []
             while ( len(new_population) < self.nb_individuals ):
                 if (self.rng.random_sample() < self.p_crossover):
@@ -173,7 +163,7 @@ class GeneticProgramming:
                 sizes = []
                 for p in new_population:
                     sizes.append(p.tree.getMaxDepth())
-                print('Max size of individuals', np.max(sizes))
+                print('Mean size of individuals', np.mean(sizes))
 
             fitness = []
             for p in new_population:
@@ -181,8 +171,8 @@ class GeneticProgramming:
             scores['Train'].append(np.mean(fitness))
             population = new_population
 
-        plt.plot(scores['Train'])
-        plt.show()
+        # plt.plot(scores['Train'])
+        # plt.show()
 
         # Fitness
 

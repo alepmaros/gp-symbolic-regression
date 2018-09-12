@@ -1,5 +1,6 @@
 import os, argparse, sys, random
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from src.utils import read_dataset
@@ -48,6 +49,7 @@ if __name__ == '__main__':
 
     rgenerator = np.random.RandomState(seed=args.random_seed)
 
+    total_scores = []
     for i in range(0, args.runs):
         gp = GeneticProgramming(train, test,
                                 args.individuals,
@@ -57,3 +59,9 @@ if __name__ == '__main__':
                                 args.tournament_size,
                                 rgenerator)
         scores = gp.run()
+        total_scores.append(scores)
+
+    scores_train = [ x['Train'] for x in total_scores ]
+
+    plt.plot( np.mean(scores_train, axis=0))
+    plt.show()
