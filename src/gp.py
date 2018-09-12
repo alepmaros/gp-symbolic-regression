@@ -68,19 +68,23 @@ class GeneticProgramming:
         random_node_1 = son1.select_random_node(self.rng)
         random_node_2 = son2.select_random_node(self.rng)
 
-        parent_aux = random_node_1[1].parent
-        random_node_1[1].parent = random_node_2[1].parent
-        random_node_2[1].parent = parent_aux
+        parent_rn1 = random_node_1['node'].parent
+        parent_rn2 = random_node_2['node'].parent
 
-        if (random_node_1[0] == 'left'):
-            random_node_2[1].parent.left = random_node_2[1]
-        else:
-            random_node_2[1].parent.right = random_node_2[1]
+        if (random_node_1['cur_depth'] + random_node_2['node_depth'] <= self.max_tree_depth):
+            if (random_node_1['position'] == 'left'):
+                parent_rn1.left = random_node_2['node']
+            else:
+                parent_rn1.right = random_node_2['node']
 
-        if (random_node_2[0] == 'left'):
-            random_node_1[1].parent.left = random_node_1[1]
-        else:
-            random_node_1[1].parent.right = random_node_1[1]
+        if (random_node_2['cur_depth'] + random_node_1['node_depth'] <= self.max_tree_depth):
+            if (random_node_2['position'] == 'left'):
+                parent_rn2.left = random_node_1['node']
+            else:
+                parent_rn2.right = random_node_1['node']
+
+        random_node_1['node'].parent = parent_rn2
+        random_node_2['node'].parent = parent_rn1
 
         return son1, son2
 
@@ -88,20 +92,20 @@ class GeneticProgramming:
         new_individual = copy.deepcopy(individual)
 
         random_node = new_individual.select_random_node(self.rng)
-        old_node_type = random_node[1].type
+        old_node_type = random_node['node'].type
 
         # If it is the last node of the tree, you cant turn into a function
-        if (random_node[2] == self.max_tree_depth):
+        if (random_node['cur_depth'] == self.max_tree_depth):
             r = self.rng.randint(0, len(self.node_list['terminals']))
-            new_node = self.node_list['terminals'][r](random_node[1].parent, self.n_features, self.rng)
+            new_node = self.node_list['terminals'][r](random_node['node'].parent, self.n_features, self.rng)
         else:
             r = self.rng.randint(0, len(self.node_list['all']))
-            new_node = self.node_list['all'][r](random_node[1].parent, self.n_features, self.rng)
+            new_node = self.node_list['all'][r](random_node['node'].parent, self.n_features, self.rng)
 
-        if (random_node[0] == 'left'):
-            random_node[1].parent.left  = new_node
+        if (random_node['position'] == 'left'):
+            random_node['node'].parent.left  = new_node
         else:
-            random_node[1].parent.right = new_node
+            random_node['node'].parent.right = new_node
 
         # Need to expand it (TO-DO NEED TO ADD DEPTH CHECK HERE, WILL JUST ADD TWO NEW VARIABLES FOR NOW)
         if (old_node_type == 'Terminal' and new_node.type == 'Function'):
@@ -111,8 +115,8 @@ class GeneticProgramming:
             new_node.right = self.node_list['terminals'][r](new_node.parent, self.n_features, self.rng)
 
         if (old_node_type == 'Function' and new_node.type == 'Function'):
-            new_node.left = random_node[1].left
-            new_node.right = random_node[1].right
+            new_node.left = random_node['node'].left
+            new_node.right = random_node['node'].right
 
         if (old_node_type == 'Function' and new_node.type == 'Terminal'):
             new_node.left  = None
@@ -147,6 +151,7 @@ class GeneticProgramming:
         for i in range(0, self.nb_generations):
             if (i % 10 == 0):
                 print('Generation', i)
+                print(len(population))
             new_population = []
             while ( len(new_population) < self.nb_individuals ):
                 if (self.rng.random_sample() < self.p_crossover):
@@ -167,8 +172,8 @@ class GeneticProgramming:
             if (i % 10 == 0):
                 sizes = []
                 for p in new_population:
-                    sizes.append(len(p.tree.root.__str__()))
-                print('Avg size of individuals', np.mean(sizes))
+                    sizes.append(p.tree.getMaxDepth())
+                print('Max size of individuals', np.max(sizes))
 
             fitness = []
             for p in new_population:

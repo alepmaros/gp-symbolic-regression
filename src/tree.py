@@ -34,12 +34,18 @@ class Tree:
 
     def _getListOfNodes(self, node_list, node, position, depth):
         if (node == None):
-            return
+            return depth-1
 
-        node_list.append( (position, node, depth) )
-        self._getListOfNodes(node_list, node.left, 'left', depth+1)
-        self._getListOfNodes(node_list, node.right, 'right', depth+1)
+        max_depth_left  = self._getListOfNodes(node_list, node.left, 'left', depth+1)
+        max_depth_right = self._getListOfNodes(node_list, node.right, 'right', depth+1)
+        max_depth = max([max_depth_left, max_depth_right])
+        node_list.append({
+            'position': position,
+            'node': node,
+            'cur_depth': depth,
+            'node_depth': max_depth - depth})
 
+        return max_depth
 
     def getListOfNodes(self):
         node_list = []
@@ -48,6 +54,22 @@ class Tree:
         self._getListOfNodes(node_list, self.root.right, 'right', 1)
 
         return node_list
+
+    def _getMaxDepth(self, node, depth):
+        if (node == None):
+            return depth-1
+        
+        max_depth_left  = self._getMaxDepth(node.left, depth+1)
+        max_depth_right = self._getMaxDepth(node.right, depth+1)
+        return max(max_depth_left, max_depth_right)
+
+    def getMaxDepth(self):
+        max_depth_left  = self._getMaxDepth(self.root.left, 1)
+        max_depth_right = self._getMaxDepth(self.root.right, 1)
+
+        return max(max_depth_left, max_depth_right)
+        
+
 
 #########################
 # FUNCTIONS             #

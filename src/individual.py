@@ -39,7 +39,6 @@ class Individual:
         return node
 
     def grow(self, node_list, rng):
-        
         # Choose a random Node to be added to the tree. The Root needs to be a function
         r = rng.randint(0, len(node_list['functions']))
 
