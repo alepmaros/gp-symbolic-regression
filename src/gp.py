@@ -90,8 +90,14 @@ class GeneticProgramming:
         random_node = new_individual.select_random_node(self.rng)
         old_node_type = random_node[1].type
 
-        r = self.rng.randint(0, len(self.node_list['all']))
-        new_node = self.node_list['all'][r](random_node[1].parent, self.n_features, self.rng)
+        # If it is the last node of the tree, you cant turn into a function
+        if (random_node[2] == self.max_tree_depth):
+            r = self.rng.randint(0, len(self.node_list['terminals']))
+            new_node = self.node_list['terminals'][r](random_node[1].parent, self.n_features, self.rng)
+        else:
+            r = self.rng.randint(0, len(self.node_list['all']))
+            new_node = self.node_list['all'][r](random_node[1].parent, self.n_features, self.rng)
+
         if (random_node[0] == 'left'):
             random_node[1].parent.left  = new_node
         else:
@@ -158,6 +164,12 @@ class GeneticProgramming:
                     self._fitness([mutated_individual])
                     new_population.append(mutated_individual)
             
+            if (i % 10 == 0):
+                sizes = []
+                for p in new_population:
+                    sizes.append(len(p.tree.root.__str__()))
+                print('Avg size of individuals', np.mean(sizes))
+
             fitness = []
             for p in new_population:
                 fitness.append(p.fitness)

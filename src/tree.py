@@ -32,20 +32,20 @@ class Tree:
         if(self.root != None):
             return self.root.__str__()
 
-    def _getListOfNodes(self, node_list, node, position):
+    def _getListOfNodes(self, node_list, node, position, depth):
         if (node == None):
             return
 
-        node_list.append( (position, node) )
-        self._getListOfNodes(node_list, node.left, 'left')
-        self._getListOfNodes(node_list, node.right, 'right')
+        node_list.append( (position, node, depth) )
+        self._getListOfNodes(node_list, node.left, 'left', depth+1)
+        self._getListOfNodes(node_list, node.right, 'right', depth+1)
 
 
     def getListOfNodes(self):
         node_list = []
 
-        self._getListOfNodes(node_list, self.root.left, 'left')
-        self._getListOfNodes(node_list, self.root.right, 'right')
+        self._getListOfNodes(node_list, self.root.left, 'left', 1)
+        self._getListOfNodes(node_list, self.root.right, 'right', 1)
 
         return node_list
 
