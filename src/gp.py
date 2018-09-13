@@ -68,25 +68,6 @@ class GeneticProgramming:
         else:
             ind2.parent.right = ind1   
         ind1.parent = ind2.parent
-
-    def _swap_nodes2(self, ind1, position1, ind2, position2):
-        
-        ind1_parent = ind1.parent
-        ind2_parent = ind2.parent
-        
-        if position1 == 'left':
-            ind1.parent.left = ind2
-        else:
-            ind1.parent.right = ind2
-
-        if position2 == 'left':
-            ind2.parent.left = ind1
-        else:
-            ind1.parent.right = ind1
-           
-        ind1.parent = ind2_parent
-        ind2.parent = ind1_parent
-
     
     def _crossover(self, ind1, ind2):
         son1 = copy.deepcopy(ind1)
@@ -182,11 +163,11 @@ class GeneticProgramming:
                     ind1 = self._tournament(population)
                     ind2 = self._tournament(population)
                     son1, son2 = self._crossover(ind1, ind2)
+                    son1 = copy.deepcopy(son1)
+                    son2 = copy.deepcopy(son2)
                     self._fitness([son1, son2])
-                    if (son1.fitness < 10):
-                        new_population.append(son1)
-                    if (son2.fitness < 10):
-                        new_population.append(son2)
+                    new_population.append(son1)
+                    new_population.append(son2)
                 else:
                     # Do Mutation
                     individual = self._tournament(population)
@@ -196,14 +177,17 @@ class GeneticProgramming:
             
             if (i % 10 == 0):
                 sizes = []
+                fit = []
                 for p in new_population:
                     sizes.append(p.tree.getMaxDepth())
+                    fit.append(p.fitness)
                 print('Mean size of individuals', np.mean(sizes))
+                print('Mean fitness', np.mean(fit) )
 
-            fitness = []
+            fit = []
             for p in new_population:
-                fitness.append(p.fitness)
-            scores['Train'].append(np.mean(fitness))
+                fit.append(p.fitness)
+            scores['Train'].append(np.mean(fit))
             population = new_population
 
         # plt.plot(scores['Train'])

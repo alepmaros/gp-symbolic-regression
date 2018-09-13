@@ -63,9 +63,8 @@ if __name__ == '__main__':
         total_scores.append(scores)
 
     scores_train = [ x['Train'] for x in total_scores ]
-
     plt.style.use('ggplot')
     plt.errorbar(np.arange(0,args.generations), 
-                np.median(scores_train, axis=0),
-                np.std(scores_train))
+                np.mean(scores_train, axis=0),
+                np.std(scores_train, axis=0))
     plt.show()
