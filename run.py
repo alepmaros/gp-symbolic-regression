@@ -51,6 +51,7 @@ if __name__ == '__main__':
 
     total_scores = []
     for i in range(0, args.runs):
+        print('Run', i)
         gp = GeneticProgramming(train, test,
                                 args.individuals,
                                 args.generations,
