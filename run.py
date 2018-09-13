@@ -19,9 +19,9 @@ if __name__ == '__main__':
                         help='The maximum depth of the function tree')
     parser.add_argument('--crossover-probability', '-c', type=float, default=0.95,
                         help='Crossover probability (mutation will be 1-p)')
-    parser.add_argument('--individuals', '-i', type=int, default=50,
-                        help='The number of individuals per generation')
-    parser.add_argument('--tournament-size', type=int, default=10,
+    parser.add_argument('--population', '-p', type=int, default=50,
+                        help='The number of the population per generation')
+    parser.add_argument('--tournament-size', '-k', type=int, default=10,
                         help='How many individuals will be selected in the tournament')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     for i in range(0, args.runs):
         print('Run', i)
         gp = GeneticProgramming(train, test,
-                                args.individuals,
+                                args.population,
                                 args.generations,
                                 args.crossover_probability,
                                 args.max_tree_depth,
@@ -64,5 +64,8 @@ if __name__ == '__main__':
 
     scores_train = [ x['Train'] for x in total_scores ]
 
-    plt.plot( np.mean(scores_train, axis=0))
+    plt.style.use('ggplot')
+    plt.errorbar(np.arange(0,args.generations), 
+                np.median(scores_train, axis=0),
+                np.std(scores_train))
     plt.show()

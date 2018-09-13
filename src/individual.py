@@ -1,7 +1,10 @@
 import itertools
 
+from copy import deepcopy
 import numpy as np
 from src import tree
+
+# from utils import read_dataset
 
 class Individual:
     def __init__(self, max_depth=7, n_features=2):
@@ -10,13 +13,24 @@ class Individual:
         self.n_features = n_features
         self.fitness    = None
 
+        # self.list_nodes = None
+
     def predict(self, X):
         y_pred = self.tree.evalTree(X)
         return y_pred
 
     def select_random_node(self, rng):
+        # if (self.list_nodes == None):
         nodes = self.tree.getListOfNodes()
         return nodes[rng.randint(0, len(nodes))]
+
+    def __deepcopy__(self, memodict={}):
+        copy_object = Individual()
+        copy_object.tree       = deepcopy(self.tree)
+        copy_object.max_depth  = self.max_depth
+        copy_object.n_features = self.n_features
+        copy_object.fitness    = None
+        return copy_object
 
 
     #########################################
@@ -70,18 +84,42 @@ class Individual:
         self.tree.root.right = self._full(self.tree.root, self.tree.root.right, 1, node_list, rng)
 
 
+# synth1_train = 'datasets/synth1/synth1-train.csv'
+# synth1_test  = 'datasets/synth1/synth1-test.csv'
+# train, test = read_dataset(synth1_train, synth1_test)
+# X_train = train[:, :-1]
+# y_train = train[:,-1]
+# X_test  = test[:, :-1]
+# y_test  = test[:, -1]
+# n_features     = len(X_train[0])
+
+# print(X_train)
+# print(y_train)
+
 # node_list = {
 #     'all': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply, tree.Value, tree.Variable ],
 #     'functions': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply ],
 #     'terminals': [ tree.Value, tree.Variable ]
 # }
 
-# rng = np.random.RandomState(seed=2)
-# i = Individual(max_depth=7, n_features=4)
+# rng = np.random.RandomState()
+# i = Individual(max_depth=7, n_features=n_features)
 # i.grow(node_list, rng)
-# print(i.tree)
+# print('i1', i.tree)
+# print(i.predict(X_train))
+# print(y_train - i.predict(X_train))
 
-# print('-----')
+# i2 = deepcopy(i)
+# print('i2', i2.tree)
+# rnode = i2.select_random_node(rng)
+# print('rnode', rnode['node'])
 
-# i.full(node_list, rng)
-# print(i.tree)
+# rnode_copy = deepcopy(rnode['node'])
+# print(rnode_copy.parent)
+# print('rnode_copy', rnode_copy)
+# rnode_copy = tree.Variable(rnode_copy.parent, 3, rng)
+# print('rnode_copy_changed', rnode_copy)
+
+# print('i1', i.tree)
+# print('i2', i2.tree)
+

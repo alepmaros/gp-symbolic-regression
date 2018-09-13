@@ -1,3 +1,4 @@
+from copy import deepcopy
 import numpy as np
 import random
 
@@ -13,6 +14,9 @@ class Node:
         self.parent = None
 
     def eval(self, X):
+        raise NotImplementedError
+
+    def __deepcopy__(self, memodict={}):
         raise NotImplementedError
 
 class Tree:
@@ -69,22 +73,26 @@ class Tree:
 
         return max(max_depth_left, max_depth_right)
         
-
+    def __deepcopy__(self, memodict={}):
+        copy_object = Tree()
+        copy_object.root = deepcopy(self.root)
+        return copy_object
 
 #########################
 # FUNCTIONS             #
 #########################
 
 class Function(Node):
-    def __init__(self, parent, n_features):
+    def __init__(self, parent, n_features, rng):
         super().__init__()
         self.type = 'Function'
         self.n_features = n_features
         self.parent = parent
+        self.rng    = rng
 
 class Sum(Function):
     def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features)
+        super().__init__(parent, n_features, rng)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -95,13 +103,23 @@ class Sum(Function):
     def __str__(self):
         return '(+ {} {})'.format(self.left.__str__(), self.right.__str__())
 
+    def __deepcopy__(self, memodict={}):
+        copy_object = Sum(None, self.n_features, self.rng)
+        copy_object.parent       = None
+        copy_object.left         = deepcopy(self.left)
+        copy_object.right        = deepcopy(self.right)
+        if (copy_object.left != None):
+            copy_object.left.parent  = self
+        if (copy_object.right != None):
+            copy_object.right.parent  = self
+        return copy_object
+
 class Multiply(Function):
     def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features)
+        super().__init__(parent, n_features, rng)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
-            print(self.parent)
             raise Exception('Left or Right value not set for Multiply')
         
         return np.multiply(self.left.eval(X), self.right.eval(X))
@@ -109,9 +127,20 @@ class Multiply(Function):
     def __str__(self):
         return '(* {} {})'.format(self.left.__str__(), self.right.__str__())
 
+    def __deepcopy__(self, memodict={}):
+        copy_object = Multiply(None, self.n_features, self.rng)
+        copy_object.parent       = None
+        copy_object.left         = deepcopy(self.left)
+        copy_object.right        = deepcopy(self.right)
+        if (copy_object.left != None):
+            copy_object.left.parent  = self
+        if (copy_object.right != None):
+            copy_object.right.parent  = self
+        return copy_object
+
 class Subtraction(Function):
     def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features)
+        super().__init__(parent, n_features, rng)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -121,10 +150,21 @@ class Subtraction(Function):
 
     def __str__(self):
         return '(- {} {})'.format(self.left.__str__(), self.right.__str__())
+
+    def __deepcopy__(self, memodict={}):
+        copy_object = Subtraction(None, self.n_features, self.rng)
+        copy_object.parent       = None
+        copy_object.left         = deepcopy(self.left)
+        copy_object.right        = deepcopy(self.right)
+        if (copy_object.left != None):
+            copy_object.left.parent  = self
+        if (copy_object.right != None):
+            copy_object.right.parent  = self
+        return copy_object
         
 class Division(Function):
     def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features)
+        super().__init__(parent, n_features, rng)
 
     def eval(self, X):
         if (self.left == None or self.right == None):
@@ -139,21 +179,33 @@ class Division(Function):
     def __str__(self):
         return '(/ {} {})'.format(self.left.__str__(), self.right.__str__())
 
+    def __deepcopy__(self, memodict={}):
+        copy_object = Division(None, self.n_features, self.rng)
+        copy_object.parent       = None
+        copy_object.left         = deepcopy(self.left)
+        copy_object.right        = deepcopy(self.right)
+        if (copy_object.left != None):
+            copy_object.left.parent  = self
+        if (copy_object.right != None):
+            copy_object.right.parent  = self
+        return copy_object
+
 #########################
 # TERMINALS             #
 #########################
 
 class Terminal(Node):
 
-    def __init__(self, parent, n_features):
+    def __init__(self, parent, n_features, rng):
         super().__init__()
         self.type = 'Terminal'
         self.n_features = n_features
         self.parent = parent
+        self.rng    = rng
 
 class Value(Terminal):
     def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features)
+        super().__init__(parent, n_features, rng)
         self.value = round(rng.uniform(-1, 1), 3)
 
     def eval(self, X):
@@ -162,9 +214,21 @@ class Value(Terminal):
     def __str__(self):
         return str(self.value)
 
+    def __deepcopy__(self, memodict={}):
+        copy_object = Value(None, self.n_features, self.rng)
+        copy_object.value        = self.value
+        copy_object.parent       = None
+        copy_object.left         = deepcopy(self.left)
+        copy_object.right        = deepcopy(self.right)
+        if (copy_object.left != None):
+            copy_object.left.parent  = self
+        if (copy_object.right != None):
+            copy_object.right.parent  = self
+        return copy_object
+
 class Variable(Terminal):
     def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features)
+        super().__init__(parent, n_features, rng)
         # Value here represents the i position of the X vector
         self.value = rng.randint(0, n_features)
 
@@ -173,6 +237,18 @@ class Variable(Terminal):
 
     def __str__(self):
         return 'X[{}]'.format(self.value)
+
+    def __deepcopy__(self, memodict={}):
+        copy_object = Variable(None, self.n_features, self.rng)
+        copy_object.value        = self.value
+        copy_object.parent       = None
+        copy_object.left         = deepcopy(self.left)
+        copy_object.right        = deepcopy(self.right)
+        if (copy_object.left != None):
+            copy_object.left.parent  = self
+        if (copy_object.right != None):
+            copy_object.right.parent  = self
+        return copy_object
 
 # X = np.array([[1, 2, 3], [3, 4, 5], [6, 7, 8]])
 

@@ -68,6 +68,25 @@ class GeneticProgramming:
         else:
             ind2.parent.right = ind1   
         ind1.parent = ind2.parent
+
+    def _swap_nodes2(self, ind1, position1, ind2, position2):
+        
+        ind1_parent = ind1.parent
+        ind2_parent = ind2.parent
+        
+        if position1 == 'left':
+            ind1.parent.left = ind2
+        else:
+            ind1.parent.right = ind2
+
+        if position2 == 'left':
+            ind2.parent.left = ind1
+        else:
+            ind1.parent.right = ind1
+           
+        ind1.parent = ind2_parent
+        ind2.parent = ind1_parent
+
     
     def _crossover(self, ind1, ind2):
         son1 = copy.deepcopy(ind1)
@@ -84,6 +103,13 @@ class GeneticProgramming:
         if (random_node_2['cur_depth'] + random_node_1['node_depth'] <= self.max_tree_depth):
             self._swap_nodes( copy.deepcopy(random_node_1['node']), random_node_2['node'] )
 
+        # print(ind1.tree)
+        # print(ind2.tree)
+        # print('swap')
+        # print(son1.tree)
+        # print(son2.tree)
+        # input()
+    
         return son1, son2
 
     def _mutation(self, individual):
@@ -120,6 +146,7 @@ class GeneticProgramming:
             new_node.left  = None
             new_node.right = None
 
+        # new_individual.node_list = None
         return new_individual
 
     def _fitness(self, population):
@@ -128,6 +155,12 @@ class GeneticProgramming:
             y_pred = p.predict(self.X_train)
             error = np.sqrt(np.sum(np.power(self.y_train - y_pred, 2)) / normalization)
             p.fitness = error
+
+            # if (error > 1000):
+            #     print(p.tree)
+            #     print(y_pred)
+            #     print(error)
+            #     input()
 
     def run(self):
         scores = {
@@ -150,8 +183,10 @@ class GeneticProgramming:
                     ind2 = self._tournament(population)
                     son1, son2 = self._crossover(ind1, ind2)
                     self._fitness([son1, son2])
-                    new_population.append(son1)
-                    new_population.append(son2)
+                    if (son1.fitness < 10):
+                        new_population.append(son1)
+                    if (son2.fitness < 10):
+                        new_population.append(son2)
                 else:
                     # Do Mutation
                     individual = self._tournament(population)

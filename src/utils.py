@@ -1,4 +1,4 @@
-import csv
+import csv, copy
 
 import numpy as np
 
