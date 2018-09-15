@@ -109,9 +109,9 @@ class Sum(Function):
         copy_object.left         = deepcopy(self.left)
         copy_object.right        = deepcopy(self.right)
         if (copy_object.left != None):
-            copy_object.left.parent  = self
+            copy_object.left.parent  = copy_object
         if (copy_object.right != None):
-            copy_object.right.parent  = self
+            copy_object.right.parent  = copy_object
         return copy_object
 
 class Multiply(Function):
@@ -133,9 +133,9 @@ class Multiply(Function):
         copy_object.left         = deepcopy(self.left)
         copy_object.right        = deepcopy(self.right)
         if (copy_object.left != None):
-            copy_object.left.parent  = self
+            copy_object.left.parent  = copy_object
         if (copy_object.right != None):
-            copy_object.right.parent  = self
+            copy_object.right.parent  = copy_object
         return copy_object
 
 class Subtraction(Function):
@@ -157,9 +157,9 @@ class Subtraction(Function):
         copy_object.left         = deepcopy(self.left)
         copy_object.right        = deepcopy(self.right)
         if (copy_object.left != None):
-            copy_object.left.parent  = self
+            copy_object.left.parent  = copy_object
         if (copy_object.right != None):
-            copy_object.right.parent  = self
+            copy_object.right.parent  = copy_object
         return copy_object
         
 class Division(Function):
@@ -185,9 +185,9 @@ class Division(Function):
         copy_object.left         = deepcopy(self.left)
         copy_object.right        = deepcopy(self.right)
         if (copy_object.left != None):
-            copy_object.left.parent  = self
+            copy_object.left.parent  = copy_object
         if (copy_object.right != None):
-            copy_object.right.parent  = self
+            copy_object.right.parent  = copy_object
         return copy_object
 
 #########################
@@ -209,7 +209,7 @@ class Value(Terminal):
         self.value = round(rng.uniform(-1, 1), 3)
 
     def eval(self, X):
-        return np.repeat(self.value, X.shape[0])
+        return np.full(X.shape[0], self.value)
         
     def __str__(self):
         return str(self.value)
@@ -221,9 +221,9 @@ class Value(Terminal):
         copy_object.left         = deepcopy(self.left)
         copy_object.right        = deepcopy(self.right)
         if (copy_object.left != None):
-            copy_object.left.parent  = self
+            copy_object.left.parent  = copy_object
         if (copy_object.right != None):
-            copy_object.right.parent  = self
+            copy_object.right.parent  = copy_object
         return copy_object
 
 class Variable(Terminal):
@@ -245,9 +245,9 @@ class Variable(Terminal):
         copy_object.left         = deepcopy(self.left)
         copy_object.right        = deepcopy(self.right)
         if (copy_object.left != None):
-            copy_object.left.parent  = self
+            copy_object.left.parent  = copy_object
         if (copy_object.right != None):
-            copy_object.right.parent  = self
+            copy_object.right.parent  = copy_object
         return copy_object
 
 # X = np.array([[1, 2, 3], [3, 4, 5], [6, 7, 8]])

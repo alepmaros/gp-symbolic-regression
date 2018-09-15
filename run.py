@@ -17,12 +17,18 @@ if __name__ == '__main__':
                         help='Number of generations')
     parser.add_argument('--max-tree-depth', type=int, default=7,
                         help='The maximum depth of the function tree')
-    parser.add_argument('--crossover-probability', '-c', type=float, default=0.95,
-                        help='Crossover probability (mutation will be 1-p)')
+    parser.add_argument('--crossover-probability', '-cp', type=float, default=0.90,
+                        help='Crossover probability')
+    parser.add_argument('--mutation-probability', '-mp', type=float, default=0.05,
+                        help='Mutation Probability')
+    parser.add_argument('--reproduction-probability', '-rp', type=float, default=0.05,
+                        help='Reprodution Probability')
     parser.add_argument('--population', '-p', type=int, default=50,
                         help='The number of the population per generation')
     parser.add_argument('--tournament-size', '-k', type=int, default=10,
                         help='How many individuals will be selected in the tournament')
+    parser.add_argument('--elitist-operators', '-e', type=bool, default=False,
+                        help='If Elitist operators are enabled')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')
 
@@ -56,15 +62,37 @@ if __name__ == '__main__':
                                 args.population,
                                 args.generations,
                                 args.crossover_probability,
+                                args.mutation_probability,
+                                args.reproduction_probability,
                                 args.max_tree_depth,
                                 args.tournament_size,
                                 rgenerator)
         scores = gp.run()
         total_scores.append(scores)
 
-    scores_train = [ x['Train'] for x in total_scores ]
+    scores_train_avg = [ x['Train']['Average'] for x in total_scores ]
+    scores_train_best = [ x['Train']['Best'] for x in total_scores ]
+    # scores_train_worst = [ x['Train']['Worst'] for x in total_scores ]
     plt.style.use('ggplot')
-    plt.errorbar(np.arange(0,args.generations), 
-                np.mean(scores_train, axis=0),
-                np.std(scores_train, axis=0))
+    plt.plot(np.arange(0,args.generations), 
+                np.mean(scores_train_avg, axis=0), 'b-')
+    plt.plot(np.arange(0,args.generations), 
+                np.mean(scores_train_best, axis=0), 'g-')
+    # plt.plot(np.arange(0,args.generations), 
+    #             np.mean(scores_train_worst, axis=0), 'r-')
+    plt.fill_between(np.arange(0,args.generations),
+                    np.mean(scores_train_avg, axis=0) - np.std(scores_train_avg, axis=0),
+                    np.mean(scores_train_avg, axis=0) + np.std(scores_train_avg, axis=0),
+                    alpha=0.4, color='b')
+    plt.fill_between(np.arange(0,args.generations),
+                    np.mean(scores_train_best, axis=0) - np.std(scores_train_best, axis=0),
+                    np.mean(scores_train_best, axis=0) + np.std(scores_train_best, axis=0),
+                    alpha=0.4, color='g')
+    # plt.fill_between(np.arange(0,args.generations),
+    #                 np.mean(scores_train_worst, axis=0) - np.std(scores_train_worst, axis=0),
+    #                 np.mean(scores_train_worst, axis=0) + np.std(scores_train_worst, axis=0),
+    #                 alpha=0.4, color='r')
+    print(scores_train_avg)
     plt.show()
+
+    
