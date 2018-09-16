@@ -1,10 +1,25 @@
 import os, argparse, sys, random, time, json
 
+import multiprocessing as mp
 import matplotlib.pyplot as plt
 import numpy as np
 
 from src.utils import read_dataset
 from src.gp    import GeneticProgramming
+
+def gp_run(scores_list, train, test, args, rgnerator):
+    gp = GeneticProgramming(train, test,
+                            args.population,
+                            args.generations,
+                            args.crossover_probability,
+                            args.mutation_probability,
+                            args.reproduction_probability,
+                            args.max_tree_depth,
+                            args.tournament_size,
+                            args.elitist_operators,
+                            rgenerator)
+    scores = gp.run()
+    scores_list.append(scores)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Genetic Programming to solve Symbolic Regression')
@@ -27,7 +42,7 @@ if __name__ == '__main__':
                         help='The number of the population per generation')
     parser.add_argument('--tournament-size', '-k', type=int, default=10,
                         help='How many individuals will be selected in the tournament')
-    parser.add_argument('--elitist-operators', '-e', type=bool, default=False,
+    parser.add_argument('--elitist-operators', action='store_true',
                         help='If Elitist operators are enabled')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')
@@ -56,6 +71,7 @@ if __name__ == '__main__':
         exit('Invalid Dataset')
 
     rgenerator = np.random.RandomState(seed=args.random_seed)
+    run_seeds = rgenerator.randint(0, 1000000000, args.runs)
 
     all_runs = {
         'scores': [],
@@ -68,29 +84,30 @@ if __name__ == '__main__':
             'Reproduction Probability': args.reproduction_probability,
             'Max Tree Depth': args.max_tree_depth,
             'Tournament Size': args.tournament_size,
-            'Random Seed': args.random_seed
+            'Random Seed': args.random_seed,
+            'Elitist Operators': args.elitist_operators
         }
-    } 
-    for i in range(0, args.runs):
-        print('Run', i)
-        gp = GeneticProgramming(train, test,
-                                args.population,
-                                args.generations,
-                                args.crossover_probability,
-                                args.mutation_probability,
-                                args.reproduction_probability,
-                                args.max_tree_depth,
-                                args.tournament_size,
-                                rgenerator)
-        scores = gp.run()
-        all_runs['scores'].append(scores)
+    }
+
+
+    pool = mp.Pool(7)
+    processes = []
+    with mp.Manager() as manager:
+        scores = manager.list()
+        for i in range(0, args.runs):
+            pool.apply_async(gp_run,
+                args=(scores, train, test, args, np.random.RandomState(seed=run_seeds[i])))
+        pool.close()
+        pool.join()
+
+        all_runs['scores'] = list(scores)
 
     ## Save Runs
-    save_directory = 'experiments/{}'.format(args.timestamp)
+    save_directory = 'experiments/operators_prob/{}'.format(args.timestamp)
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
-    file_name = 'scores_{}_pop{}_gen{}_cross{}_mut{}_repro{}_mtd{}_k{}_seed{}.json'.format(
+    file_name = 'scores_{}_pop{}_gen{}_cross{}_mut{}_repro{}_mtd{}_k{}_eli{}_seed{}.json'.format(
         args.dataset,
         args.population,
         args.generations,
@@ -99,6 +116,7 @@ if __name__ == '__main__':
         args.reproduction_probability,
         args.max_tree_depth,
         args.tournament_size,
+        args.elitist_operators,
         args.random_seed
     )
 

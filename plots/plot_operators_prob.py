@@ -13,7 +13,10 @@ available_lines  = ['b-', 'r-', 'g-', 'k-', 'c-']
 available_colors = ['b', 'r', 'g', 'k', 'c']
 
 plt.style.use('ggplot')
-plt.title('Fitness média com variação de probabilidade de operadores')
+f, axs = plt.subplots(1, 2, sharex='col', sharey='row')
+
+ax0 = axs.reshape(-1)[0]
+ax1 = axs.reshape(-1)[1]
 
 for i, scores_path in enumerate(args.scores):
     with open(scores_path, 'r') as fhandle:
@@ -25,14 +28,41 @@ for i, scores_path in enumerate(args.scores):
 
         scores_train_avg = [ x['Train']['Average'] for x in score['scores'] ]
 
-        plt.plot(np.arange(0,len(scores_train_avg[0])), 
+        ax0.plot(np.arange(0,len(scores_train_avg[0])), 
             np.mean(scores_train_avg, axis=0), available_lines[i],
             label=label)
 
-        plt.fill_between(np.arange(0,len(scores_train_avg[0])),
+        ax0.fill_between(np.arange(0,len(scores_train_avg[0])),
                 np.mean(scores_train_avg, axis=0) - np.std(scores_train_avg, axis=0),
                 np.mean(scores_train_avg, axis=0) + np.std(scores_train_avg, axis=0),
                 alpha=0.3, color=available_colors[i])
+
+        ax0.set_title('Fitness Média para dados de Treino')
+        ax0.set_xlabel('Geração')
+        ax0.set_ylabel('Fitness')
+        ax0.legend()
+
+# for i, scores_path in enumerate(args.scores):
+#     with open(scores_path, 'r') as fhandle:
+#         score = (json.loads(fhandle.read()))
+        
+#         crossover_proability = score['Parameters']['Crossover Probability']
+#         mutation_probability = score['Parameters']['Mutation Probability']
+#         label = '{}% Crossover - {}% Mutation'.format(crossover_proability, mutation_probability)
+
+#         scores_test_avg = [ x['Test']['Average'] for x in score['scores'] ]
+
+#         ax1.plot(np.arange(0,len(scores_test_avg[0])), 
+#             np.mean(scores_test_avg, axis=0), available_lines[i],
+#             label=label)
+
+#         ax1.fill_between(np.arange(0,len(scores_test_avg[0])),
+#                 np.mean(scores_test_avg, axis=0) - np.std(scores_test_avg, axis=0),
+#                 np.mean(scores_test_avg, axis=0) + np.std(scores_test_avg, axis=0),
+#                 alpha=0.3, color=available_colors[i])
+
+#         ax1.set_title('Fitness Média para dados de Teste')
+#         ax1.set_xlabel('Geração')
 
 plt.legend()
 plt.show()

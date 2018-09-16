@@ -206,7 +206,7 @@ class Terminal(Node):
 class Value(Terminal):
     def __init__(self, parent, n_features, rng):
         super().__init__(parent, n_features, rng)
-        self.value = round(rng.uniform(-1, 1), 3)
+        self.value = round(rng.uniform(-2, 2), 3)
 
     def eval(self, X):
         return np.full(X.shape[0], self.value)

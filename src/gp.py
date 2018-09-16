@@ -8,8 +8,8 @@ from src import tree
 
 class GeneticProgramming:
     def __init__(self, train, test, nb_individuals, nb_generations,
-        p_crossover, p_mutation, p_reproduction,
-        max_tree_depth, tournament_size, random_generator):
+        p_crossover, p_mutation, p_reproduction, max_tree_depth,
+        tournament_size, elitist_operators, random_generator):
         self.train           = train
         self.test            = test
         self.nb_individuals  = nb_individuals
@@ -19,6 +19,7 @@ class GeneticProgramming:
         self.p_mutation      = p_mutation
         self.p_reproduction  = p_reproduction
         self.tournament_size = tournament_size
+        self.elitist_operators = elitist_operators
         self.rng             = random_generator
 
         self.X_train = train[:, :-1]
@@ -76,7 +77,6 @@ class GeneticProgramming:
         return selected_individuals[0]
 
     def _swap_nodes(self, ind1, ind2):
-        
         if ind2.parent.left == ind2:
             ind2.parent.left = ind1
         else:
@@ -147,31 +147,26 @@ class GeneticProgramming:
         # new_individual.node_list = None
         return new_individual
 
-    def _fitness(self, population):
-        normalization = np.sum( np.power(self.y_train - np.mean(self.y_train), 2))
+    def _fitness(self, population, X, y, substitute_fitness=True):
+        normalization = np.sum( np.power(y - np.mean(y), 2))
         # normalization = np.std(self.y_train)
+        fitness_list = []
         for p in population:
-            y_pred = p.predict(self.X_train)
+            y_pred = p.predict(X)
             # print(y_pred)
-            error = np.sqrt(np.sum(np.power(self.y_train - y_pred, 2)) / normalization)
+            error = np.sqrt(np.sum(np.power(y - y_pred, 2)) / normalization) * ( 1.0 / (p.tree.getMaxDepth()))
+            print(error)
             # print(y_pred)
             # print(self.y_train)
             # print(y_pred-self.y_train)
             # print(np.power(y_pred - self.y_train, 2))
             # input()
             # error = np.sqrt(np.sum(np.power(y_pred - self.y_train, 2)) / len(y_pred))
-            p.fitness = error
+            fitness_list.append(error)
+            if (substitute_fitness):
+                p.fitness = error
 
-            # if (error > 1000):
-                # print()
-                
-                # print(self.X_train)
-                # for pred in y_pred:
-                #     print(pred)
-                # print(error)
-                # print(p.tree)
-                # input()
-
+        return fitness_list
     def run(self):
         scores = {
             'Train': {
@@ -188,10 +183,10 @@ class GeneticProgramming:
 
         # Generate initial population
         population = self._init_population()
-        self._fitness(population)
+        self._fitness(population, self.X_train, self.y_train)
 
         for gen_i in range(0, self.nb_generations):
-            if (gen_i % 10 == 0):
+            if (gen_i % 50 == 0):
                 print('Generation', gen_i)
             new_population = []
             while ( len(new_population) < self.nb_individuals ):
@@ -204,7 +199,7 @@ class GeneticProgramming:
                     ind1 = self._tournament(population)
                     ind2 = self._tournament(population)
                     son1, son2 = self._crossover(ind1, ind2)
-                    self._fitness([son1, son2])
+                    self._fitness([son1, son2], self.X_train, self.y_train)
 
                     new_population.append(son1)
                     new_population.append(son2)
@@ -212,36 +207,40 @@ class GeneticProgramming:
                     # Do Mutation
                     individual = self._tournament(population)
                     mutated_individual = self._mutation(individual)
-                    self._fitness([mutated_individual])
+                    self._fitness([mutated_individual], self.X_train, self.y_train)
                     new_population.append(mutated_individual)
                 else:
                     reproduct = self._tournament(population)
                     new_population.append(reproduct)
                     # print('hi')
 
-            fitness_scores = []
+            fitness_train = []
             best_individual = new_population[0]
             for p in new_population:
                 if (p.fitness < best_individual.fitness):
                     best_individual = p
-                fitness_scores.append(p.fitness)
-            fitness_scores = np.array(fitness_scores)
-            fitness_scores = fitness_scores[fitness_scores < np.percentile(fitness_scores, 95)]
+                fitness_train.append(p.fitness)
+            fitness_train = np.array(fitness_train)
+            fitness_train = fitness_train[fitness_train < np.percentile(fitness_train, 80)]
 
-            if (gen_i % 10 == 0):
+            if (gen_i % 50 == 0):
                 sizes = []
                 for p in new_population:
                     sizes.append(p.tree.getMaxDepth())
                 print('Mean size of individuals', np.mean(sizes))
-                print('Mean fitness', np.mean( fitness_scores ))
-                print('Best fitness', np.min( fitness_scores ))
-                # print('Worst fitness', np.max( fitness_scores ))
+                print('Mean fitness', np.mean( fitness_train ))
+                print('Best fitness', np.min( fitness_train ))
 
-
-            scores['Train']['Average'].append(np.mean(fitness_scores) )
-            scores['Train']['Best'].append(np.min(fitness_scores))
-            # scores['Train']['Worst'].append(np.max(fit[fit < np.percentile(fit,90)]))
+            scores['Train']['Average'].append(np.mean(fitness_train) )
+            scores['Train']['Best'].append(np.min(fitness_train))
             scores['Train']['Best Individiual'] = best_individual.tree.__str__()
+            
+            fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
+            fitness_test = np.array(fitness_test)
+            fitness_test = fitness_test[fitness_test < np.percentile(fitness_test, 80)]
+            scores['Test']['Average'].append(np.mean(fitness_test) )
+            scores['Test']['Best'].append(np.min(fitness_test))
+
             population = new_population
 
         # plt.plot(scores['Train'])
