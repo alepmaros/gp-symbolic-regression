@@ -154,7 +154,7 @@ class GeneticProgramming:
         for p in population:
             y_pred = p.predict(X)
             # print(y_pred)
-            error = np.sqrt(np.sum(np.power(y - y_pred, 2)) / normalization) * ( 1.0 / (p.tree.getMaxDepth()))
+            error = np.sqrt(np.sum(np.power(y - y_pred, 2)) / normalization) #* ( (p.tree.getMaxDepth() / 6))
             print(error)
             # print(y_pred)
             # print(self.y_train)
