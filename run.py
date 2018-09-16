@@ -1,4 +1,4 @@
-import os, argparse, sys, random
+import os, argparse, sys, random, time, json
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +15,7 @@ if __name__ == '__main__':
                         help='Number of runs to calculate mean and std')
     parser.add_argument('--generations', '-g', type=int, default=50,
                         help='Number of generations')
-    parser.add_argument('--max-tree-depth', type=int, default=7,
+    parser.add_argument('--max-tree-depth', type=int, default=6,
                         help='The maximum depth of the function tree')
     parser.add_argument('--crossover-probability', '-cp', type=float, default=0.90,
                         help='Crossover probability')
@@ -31,6 +31,8 @@ if __name__ == '__main__':
                         help='If Elitist operators are enabled')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')
+    parser.add_argument('--timestamp', type=str, default=str(time.time()).split('.')[0],
+                        help='Timestamp of when the experiment is being run, to aggregate same experiments into one folder.')
 
     args = parser.parse_args()
     print(args)
@@ -55,7 +57,20 @@ if __name__ == '__main__':
 
     rgenerator = np.random.RandomState(seed=args.random_seed)
 
-    total_scores = []
+    all_runs = {
+        'scores': [],
+        'Parameters': {
+            'Dataset': args.dataset,
+            'Population': args.population,
+            'Generations': args.generations,
+            'Crossover Probability': args.crossover_probability,
+            'Mutation Probability': args.mutation_probability,
+            'Reproduction Probability': args.reproduction_probability,
+            'Max Tree Depth': args.max_tree_depth,
+            'Tournament Size': args.tournament_size,
+            'Random Seed': args.random_seed
+        }
+    } 
     for i in range(0, args.runs):
         print('Run', i)
         gp = GeneticProgramming(train, test,
@@ -68,31 +83,27 @@ if __name__ == '__main__':
                                 args.tournament_size,
                                 rgenerator)
         scores = gp.run()
-        total_scores.append(scores)
+        all_runs['scores'].append(scores)
 
-    scores_train_avg = [ x['Train']['Average'] for x in total_scores ]
-    scores_train_best = [ x['Train']['Best'] for x in total_scores ]
-    # scores_train_worst = [ x['Train']['Worst'] for x in total_scores ]
-    plt.style.use('ggplot')
-    plt.plot(np.arange(0,args.generations), 
-                np.mean(scores_train_avg, axis=0), 'b-')
-    plt.plot(np.arange(0,args.generations), 
-                np.mean(scores_train_best, axis=0), 'g-')
-    # plt.plot(np.arange(0,args.generations), 
-    #             np.mean(scores_train_worst, axis=0), 'r-')
-    plt.fill_between(np.arange(0,args.generations),
-                    np.mean(scores_train_avg, axis=0) - np.std(scores_train_avg, axis=0),
-                    np.mean(scores_train_avg, axis=0) + np.std(scores_train_avg, axis=0),
-                    alpha=0.4, color='b')
-    plt.fill_between(np.arange(0,args.generations),
-                    np.mean(scores_train_best, axis=0) - np.std(scores_train_best, axis=0),
-                    np.mean(scores_train_best, axis=0) + np.std(scores_train_best, axis=0),
-                    alpha=0.4, color='g')
-    # plt.fill_between(np.arange(0,args.generations),
-    #                 np.mean(scores_train_worst, axis=0) - np.std(scores_train_worst, axis=0),
-    #                 np.mean(scores_train_worst, axis=0) + np.std(scores_train_worst, axis=0),
-    #                 alpha=0.4, color='r')
-    print(scores_train_avg)
-    plt.show()
+    ## Save Runs
+    save_directory = 'experiments/{}'.format(args.timestamp)
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
 
+    file_name = 'scores_{}_pop{}_gen{}_cross{}_mut{}_repro{}_mtd{}_k{}_seed{}.json'.format(
+        args.dataset,
+        args.population,
+        args.generations,
+        args.crossover_probability,
+        args.mutation_probability,
+        args.reproduction_probability,
+        args.max_tree_depth,
+        args.tournament_size,
+        args.random_seed
+    )
+
+    with open(os.path.join(save_directory, file_name), 'w') as fhandle:
+        fhandle.write(json.dumps(all_runs, indent=2))
+
+    print(os.path.join(save_directory, file_name))
     

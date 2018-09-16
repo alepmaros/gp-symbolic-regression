@@ -1,6 +1,7 @@
 tp1.pdf
 venv/*
 .vscode/*
+experiments/*
 
 __pycache__/*
 src/__pycache__/*

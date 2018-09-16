@@ -219,26 +219,29 @@ class GeneticProgramming:
                     new_population.append(reproduct)
                     # print('hi')
 
-            fit = []
+            fitness_scores = []
+            best_individual = new_population[0]
             for p in new_population:
-                fit.append(p.fitness)
-            fit = np.array(fit)
+                if (p.fitness < best_individual.fitness):
+                    best_individual = p
+                fitness_scores.append(p.fitness)
+            fitness_scores = np.array(fitness_scores)
+            fitness_scores = fitness_scores[fitness_scores < np.percentile(fitness_scores, 95)]
 
             if (gen_i % 10 == 0):
                 sizes = []
                 for p in new_population:
                     sizes.append(p.tree.getMaxDepth())
                 print('Mean size of individuals', np.mean(sizes))
-                
-                print('Mean fitness', np.mean( fit[fit < np.percentile(fit,95)]))
-                print('Best fitness', np.min(fit))
-                # print(new_population[i_best].tree)
-                print('Worst fitness', np.max( fit[fit < np.percentile(fit,90)] ))
+                print('Mean fitness', np.mean( fitness_scores ))
+                print('Best fitness', np.min( fitness_scores ))
+                # print('Worst fitness', np.max( fitness_scores ))
 
 
-            scores['Train']['Average'].append(np.mean( fit[fit < np.percentile(fit,95)]))
-            scores['Train']['Best'].append( np.min(fit))
-            scores['Train']['Worst'].append( np.max(fit[fit < np.percentile(fit,90)]))
+            scores['Train']['Average'].append(np.mean(fitness_scores) )
+            scores['Train']['Best'].append(np.min(fitness_scores))
+            # scores['Train']['Worst'].append(np.max(fit[fit < np.percentile(fit,90)]))
+            scores['Train']['Best Individiual'] = best_individual.tree.__str__()
             population = new_population
 
         # plt.plot(scores['Train'])
