@@ -197,7 +197,7 @@ class Sin(Function):
             return result
 
     def __str__(self):
-        return '(sin {})'.format(self.left.__str__(), self.right.__str__())
+        return '(sin {})'.format(self.left.__str__())
 
     def __deepcopy__(self, memodict={}):
         copy_object = Sin(None, self.n_features, self.rng)

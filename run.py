@@ -93,6 +93,21 @@ if __name__ == '__main__':
     }
 
 
+    # for i in range(0, args.runs):
+    #     new_rng = np.random.RandomState(seed=run_seeds[i])
+    #     gp = GeneticProgramming(train, test,
+    #                             args.population,
+    #                             args.generations,
+    #                             args.crossover_probability,
+    #                             args.mutation_probability,
+    #                             args.reproduction_probability,
+    #                             args.max_tree_depth,
+    #                             args.tournament_size,
+    #                             args.elitist_operators,
+    #                             new_rng)
+    #     scores = gp.run()
+    #     all_runs['scores'].append(scores)
+
     pool = mp.Pool(7)
     processes = []
     with mp.Manager() as manager:
@@ -107,7 +122,7 @@ if __name__ == '__main__':
         all_runs['scores'] = list(scores)
 
     ## Save Runs
-    save_directory = 'experiments/{}/{}'.format(args.test, args.timestamp)
+    save_directory = 'experiments/{}/{}'.format(args.timestamp, args.test)
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 

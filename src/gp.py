@@ -84,10 +84,6 @@ class GeneticProgramming:
         ind1.parent = ind2.parent
     
     def _crossover(self, ind1, ind2):
-        # print('crossover')
-        # print('ind1', ind1.tree)
-        # print('ind2', ind2.tree)
-
         son1 = copy.deepcopy(ind1)
         son2 = copy.deepcopy(ind2)
         son1.fitness = None
@@ -95,12 +91,11 @@ class GeneticProgramming:
 
         random_node_1 = son1.select_random_node(self.rng)
         random_node_2 = son2.select_random_node(self.rng)
+
         while ( ((random_node_1['cur_depth'] + random_node_2['node_depth']) > self.max_tree_depth) or
-                ((random_node_2['cur_depth'] + random_node_1['node_depth']) >= self.max_tree_depth)):
+                ((random_node_2['cur_depth'] + random_node_1['node_depth']) > self.max_tree_depth)):
             random_node_1 = son1.select_random_node(self.rng)
             random_node_2 = son2.select_random_node(self.rng)
-
-        
         
         # if (random_node_1['cur_depth'] + random_node_2['node_depth'] <= self.max_tree_depth):
         self._swap_nodes( copy.deepcopy(random_node_2['node']), random_node_1['node'] )
@@ -130,7 +125,6 @@ class GeneticProgramming:
         new_individual.fitness = None
 
         random_node = new_individual.select_random_node(self.rng)
-        old_node_type = random_node['node'].type
 
         sub_tree = Individual(max_depth=self.max_tree_depth, n_features=self.n_features)
         sub_tree.grow(self.node_list, self.rng, random_node['cur_depth'], self.max_tree_depth)
@@ -186,8 +180,8 @@ class GeneticProgramming:
         self._fitness(population, self.X_train, self.y_train)
 
         for gen_i in range(0, self.nb_generations):
-            if (gen_i % 50 == 0):
-                print('Generation', gen_i)
+            # if (gen_i % 50 == 0):
+            #     print('Generation', gen_i)
             new_population = []
             while ( len(new_population) < self.nb_individuals ):
                 
@@ -221,15 +215,17 @@ class GeneticProgramming:
                     best_individual = p
                 fitness_train.append(p.fitness)
             fitness_train = np.array(fitness_train)
-            fitness_train = fitness_train[fitness_train < np.percentile(fitness_train, 80)]
+            fitness_train = fitness_train[fitness_train < 3.0]
+            # for i in range(0, 5):
+            #     fitness_train = fitness_train[fitness_train != np.max(fitness_train)]
 
-            if (gen_i % 50 == 0):
-                sizes = []
-                for p in new_population:
-                    sizes.append(p.tree.getMaxDepth())
-                print('Mean size of individuals', np.mean(sizes))
-                print('Mean fitness', np.mean( fitness_train ))
-                print('Best fitness', np.min( fitness_train ))
+            # if (gen_i % 50 == 0):
+            #     sizes = []
+            #     for p in new_population:
+            #         sizes.append(p.tree.getMaxDepth())
+            #     print('Mean size of individuals', np.mean(sizes))
+            #     print('Mean fitness', np.mean( fitness_train ))
+            #     print('Best fitness', np.min( fitness_train ))
 
             scores['Train']['Average'].append(np.mean(fitness_train) )
             scores['Train']['Best'].append(np.min(fitness_train))
@@ -238,7 +234,9 @@ class GeneticProgramming:
             if (gen_i == self.nb_generations-1):
                 fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
                 fitness_test = np.array(fitness_test)
-                fitness_test = fitness_test[fitness_test < np.percentile(fitness_test, 80)]
+                # fitness_test = fitness_test[fitness_test < np.percentile(fitness_test, 99)]
+                # for i in range(0, 5):
+                #     fitness_test = fitness_test[fitness_test != np.max(fitness_test)]
                 scores['Test']['Average'].append(np.mean(fitness_test) )
                 scores['Test']['Best'].append(np.min(fitness_test))
 
