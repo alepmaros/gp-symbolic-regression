@@ -7,7 +7,8 @@ import numpy as np
 from src.utils import read_dataset
 from src.gp    import GeneticProgramming
 
-def gp_run(scores_list, train, test, args, rgnerator):
+def gp_run(scores_list, train, test, args, seed):
+    rng = np.random.RandomState(seed=seed)
     gp = GeneticProgramming(train, test,
                             args.population,
                             args.generations,
@@ -17,7 +18,7 @@ def gp_run(scores_list, train, test, args, rgnerator):
                             args.max_tree_depth,
                             args.tournament_size,
                             args.elitist_operators,
-                            rgenerator)
+                            rng)
     scores = gp.run()
     scores_list.append(scores)
 
@@ -48,6 +49,8 @@ if __name__ == '__main__':
                         help='The seed for the random number generator')
     parser.add_argument('--timestamp', type=str, default=str(time.time()).split('.')[0],
                         help='Timestamp of when the experiment is being run, to aggregate same experiments into one folder.')
+    parser.add_argument('--test', type=str, default='Default',
+                        help='Name of the test that is being run')
 
     args = parser.parse_args()
     print(args)
@@ -95,15 +98,16 @@ if __name__ == '__main__':
     with mp.Manager() as manager:
         scores = manager.list()
         for i in range(0, args.runs):
+            print('seed', run_seeds[i])
             pool.apply_async(gp_run,
-                args=(scores, train, test, args, np.random.RandomState(seed=run_seeds[i])))
+                args=(scores, train, test, args, run_seeds[i]))
         pool.close()
         pool.join()
 
         all_runs['scores'] = list(scores)
 
     ## Save Runs
-    save_directory = 'experiments/operators_prob/{}'.format(args.timestamp)
+    save_directory = 'experiments/{}/{}'.format(args.test, args.timestamp)
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 

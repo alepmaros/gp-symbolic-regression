@@ -109,6 +109,15 @@ class Individual:
 
 # rng = np.random.RandomState()
 # i = Individual(max_depth=7, n_features=n_features)
+# i.tree.root = tree.Multiply(None, n_features, rng)
+# i.tree.root.left = tree.Multiply(i.tree.root, n_features, rng)
+# i.tree.root.left.left = tree.Variable(i.tree.root.left, n_features, rng)
+# i.tree.root.left.right = tree.Variable(i.tree.root.left, n_features, rng)
+
+# i.tree.root.right = tree.Multiply(i.tree.root, n_features, rng)
+# i.tree.root.right.left = tree.Variable(i.tree.root.right, n_features, rng)
+# i.tree.root.right.right = tree.Variable(i.tree.root.right, n_features, rng)
+
 # i.grow(node_list, rng)
 # print('i1', i.tree)
 # print(i.predict(X_train))
