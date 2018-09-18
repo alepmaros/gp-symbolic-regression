@@ -182,31 +182,6 @@ class Division(Function):
         copy_object.right.parent = copy_object
         return copy_object
 
-class Sin(Function):
-    def __init__(self, parent, n_features, rng):
-        super().__init__(parent, n_features, rng)
-
-    def eval(self, X):
-        if (self.left == None or self.right == None):
-            raise Exception('Left or Right value not set for Division')
-        
-        with np.errstate(divide='ignore', invalid='ignore'):
-            result = np.sin(self.left.eval(X))
-            result[np.isinf(result)] = 1
-            result[np.isnan(result)] = 1
-            return result
-
-    def __str__(self):
-        return '(sin {})'.format(self.left.__str__())
-
-    def __deepcopy__(self, memodict={}):
-        copy_object = Sin(None, self.n_features, self.rng)
-        copy_object.parent       = None
-        copy_object.left         = deepcopy(self.left)
-        copy_object.right        = None
-        copy_object.left.parent  = copy_object
-        return copy_object
-
 #########################
 # TERMINALS             #
 #########################
@@ -253,6 +228,50 @@ class Variable(Terminal):
 
     def __deepcopy__(self, memodict={}):
         copy_object = Variable(None, self.n_features, self.rng)
+        copy_object.value        = self.value
+        copy_object.parent       = None
+        copy_object.left         = None
+        copy_object.right        = None
+        return copy_object
+
+class Sin(Terminal):
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features, rng)
+        self.value = rng.randint(0, n_features)
+
+    def eval(self, X):
+        if (self.left == None or self.right == None):
+            raise Exception('Left or Right value not set for Division')
+        
+        return np.sin(X[:,self.value])
+
+    def __str__(self):
+        return '(sin X[{}])'.format(self.value)
+
+    def __deepcopy__(self, memodict={}):
+        copy_object = Sin(None, self.n_features, self.rng)
+        copy_object.value        = self.value
+        copy_object.parent       = None
+        copy_object.left         = None
+        copy_object.right        = None
+        return copy_object
+
+class Cos(Terminal):
+    def __init__(self, parent, n_features, rng):
+        super().__init__(parent, n_features, rng)
+        self.value = rng.randint(0, n_features)
+
+    def eval(self, X):
+        if (self.left == None or self.right == None):
+            raise Exception('Left or Right value not set for Division')
+        
+        return np.cos(X[:,self.value])
+
+    def __str__(self):
+        return '(cos {})'.format(self.left.__str__())
+
+    def __deepcopy__(self, memodict={}):
+        copy_object = Cos(None, self.n_features, self.rng)
         copy_object.value        = self.value
         copy_object.parent       = None
         copy_object.left         = None
