@@ -235,11 +235,12 @@ class GeneticProgramming:
             scores['Train']['Best'].append(np.min(fitness_train))
             scores['Train']['Best Individiual'] = best_individual.tree.__str__()
             
-            fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
-            fitness_test = np.array(fitness_test)
-            fitness_test = fitness_test[fitness_test < np.percentile(fitness_test, 80)]
-            scores['Test']['Average'].append(np.mean(fitness_test) )
-            scores['Test']['Best'].append(np.min(fitness_test))
+            if (gen_i == self.nb_generations-1):
+                fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
+                fitness_test = np.array(fitness_test)
+                fitness_test = fitness_test[fitness_test < np.percentile(fitness_test, 80)]
+                scores['Test']['Average'].append(np.mean(fitness_test) )
+                scores['Test']['Best'].append(np.min(fitness_test))
 
             population = new_population
 
