@@ -245,7 +245,7 @@ class GeneticProgramming:
             
             if (gen_i == self.nb_generations-1):
                 k_individuals = self._select_k_best_individuals(new_population, k=5)
-                fitness_test = self._fitness([k_individuals], self.X_test, self.y_test, substitute_fitness=False)
+                fitness_test = self._fitness(k_individuals, self.X_test, self.y_test, substitute_fitness=False)
                 fitness_test = np.array(fitness_test)
 
                 scores['Test']['Average'].append(np.mean(fitness_test) )
