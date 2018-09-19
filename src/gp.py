@@ -241,16 +241,22 @@ class GeneticProgramming:
 
             scores['Train']['Average'].append(np.mean(fitness_train) )
             scores['Train']['Best'].append(np.min(fitness_train))
-            scores['Train']['Best Individiual'] = best_individual.tree.__str__()
+            scores['Train']['Best Individual'] = best_individual.tree.__str__()
             
             if (gen_i == self.nb_generations-1):
-                k_individuals = self._select_k_best_individuals(new_population, k=5)
-                fitness_test = self._fitness(k_individuals, self.X_test, self.y_test, substitute_fitness=False)
+                # k_individuals = self._select_k_best_individuals(new_population, k=50)
+                fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
                 fitness_test = np.array(fitness_test)
+
+                for index, fitt in enumerate(fitness_test):
+                    if fitt == np.min(fitness_test):
+                        scores['Test']['Best Individual'] = new_population[index].tree.__str__()
 
                 scores['Test']['Average'].append(np.mean(fitness_test) )
                 scores['Test']['Best'].append(np.min(fitness_test))
 
+                score_best_individual_train = self._fitness([best_individual], self.X_test, self.y_test, substitute_fitness=False)
+                scores['Test']['Best Individual From Train'] = score_best_individual_train[0]
             population = new_population
 
         # plt.plot(scores['Train'])

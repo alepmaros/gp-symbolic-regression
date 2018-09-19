@@ -24,7 +24,7 @@ for i, scores_path in enumerate(args.scores):
         score = (json.loads(fhandle.read()))
         
         individuals = score['Parameters']['Population']
-        label = r'${} Indivíduos'.format(individuals)
+        label = '{} Indivíduos'.format(individuals)
 
         scores_train_avg = [ x['Train']['Average'] for x in score['scores'] ]
 
@@ -67,7 +67,7 @@ for i, scores_path in enumerate(args.scores):
         score = (json.loads(fhandle.read()))
         
         individuals = score['Parameters']['Population']
-        label = r'{} Indivíduos'.format(individuals)
+        label = '{} Indivíduos'.format(individuals)
         
         scores_train_best = [ x['Train']['Best'][-1] for x in score['scores'] ]
         list_scores_test.append(np.ravel(scores_train_best[:-1]))
@@ -85,7 +85,7 @@ for i, scores_path in enumerate(args.scores):
         score = (json.loads(fhandle.read()))
         
         individuals = score['Parameters']['Population']
-        label = r'{} Indivíduos'.format(individuals)
+        label = '{} Indivíduos'.format(individuals)
         
         scores_test_best = [ x['Test']['Best'] for x in score['scores'] ]
         list_scores_test.append(np.ravel(scores_test_best))

@@ -24,7 +24,7 @@ for i, scores_path in enumerate(args.scores):
         score = (json.loads(fhandle.read()))
         
         tournament_size = score['Parameters']['Tournament Size']
-        label = r'$$k$ = {}'.format(tournament_size)
+        label = r'$k$ = {}'.format(tournament_size)
 
         scores_train_avg = [ x['Train']['Average'] for x in score['scores'] ]
 
