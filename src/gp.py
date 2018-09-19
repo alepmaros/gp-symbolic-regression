@@ -80,6 +80,14 @@ class GeneticProgramming:
         # Select the best (lowest)
         return selected_individuals[0]
 
+    def _select_k_best_individuals(self, population, k=5):
+        # Create a new list with this individuals
+        selected_individuals = population
+        # Sort by fitness
+        selected_individuals.sort(key=lambda x: x.fitness)
+        # Select the best (lowest)
+        return selected_individuals[0:k]
+
     def _swap_nodes(self, ind1, ind2):
         if ind2.parent.left == ind2:
             ind2.parent.left = ind1
@@ -236,10 +244,8 @@ class GeneticProgramming:
             scores['Train']['Best Individiual'] = best_individual.tree.__str__()
             
             if (gen_i == self.nb_generations-1):
-                fitness_test = self._fitness([best_individual], self.X_test, self.y_test, substitute_fitness=False)
-                fitness_test = np.array(fitness_test)
-                if (np.mean(fitness_test) > 4):
-                    fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
+                k_individuals = self._select_k_best_individuals(new_population, k=5)
+                fitness_test = self._fitness([k_individuals], self.X_test, self.y_test, substitute_fitness=False)
                 fitness_test = np.array(fitness_test)
 
                 scores['Test']['Average'].append(np.mean(fitness_test) )
