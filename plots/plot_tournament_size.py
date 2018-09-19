@@ -23,8 +23,8 @@ for i, scores_path in enumerate(args.scores):
     with open(scores_path, 'r') as fhandle:
         score = (json.loads(fhandle.read()))
         
-        individuals = score['Parameters']['Population']
-        label = r'${} Indivíduos'.format(individuals)
+        tournament_size = score['Parameters']['Tournament Size']
+        label = r'$$k$ = {}'.format(tournament_size)
 
         scores_train_avg = [ x['Train']['Average'] for x in score['scores'] ]
 
@@ -44,11 +44,11 @@ for i, scores_path in enumerate(args.scores):
 
 
 save_path, _ = os.path.split(args.scores[0])
-save_path = os.path.join(save_path, '{}_operators_prob_train.pdf'.format(args.dataset))
+save_path = os.path.join(save_path, '{}_tournament_size_train.pdf'.format(args.dataset))
 plt.tight_layout()
 plt.savefig(save_path, format='pdf')
 
-# Best Individuals
+# Best Individual Size
 
 plt.style.use('ggplot')
 f, axs = plt.subplots(1, 2, sharex='col', sharey='row')
@@ -66,8 +66,8 @@ for i, scores_path in enumerate(args.scores):
     with open(scores_path, 'r') as fhandle:
         score = (json.loads(fhandle.read()))
         
-        individuals = score['Parameters']['Population']
-        label = r'{} Indivíduos'.format(individuals)
+        tournament_size = score['Parameters']['Tournament Size']
+        label = r'$k$ = {}'.format(tournament_size)
         
         scores_train_best = [ x['Train']['Best'][-1] for x in score['scores'] ]
         list_scores_test.append(np.ravel(scores_train_best[:-1]))
@@ -84,8 +84,8 @@ for i, scores_path in enumerate(args.scores):
     with open(scores_path, 'r') as fhandle:
         score = (json.loads(fhandle.read()))
         
-        individuals = score['Parameters']['Population']
-        label = r'{} Indivíduos'.format(individuals)
+        tournament_size = score['Parameters']['Tournament Size']
+        label = r'$k$ = {}'.format(tournament_size)
         
         scores_test_best = [ x['Test']['Best'] for x in score['scores'] ]
         list_scores_test.append(np.ravel(scores_test_best))
@@ -103,6 +103,6 @@ ax1.set_title('Fitness do melhor indivíduo na última geração\npara base de T
 
 
 save_path, _ = os.path.split(args.scores[0])
-save_path = os.path.join(save_path, '{}_operators_prob_best.pdf'.format(args.dataset))
+save_path = os.path.join(save_path, '{}_tournament_size_best.pdf'.format(args.dataset))
 plt.tight_layout()
 plt.savefig(save_path, format='pdf')

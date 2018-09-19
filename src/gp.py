@@ -9,7 +9,7 @@ from src import tree
 class GeneticProgramming:
     def __init__(self, train, test, nb_individuals, nb_generations,
         p_crossover, p_mutation, p_reproduction, max_tree_depth,
-        tournament_size, elitist_operators, random_generator):
+        tournament_size, elitist_operators, allow_sin, random_generator):
         self.train           = train
         self.test            = test
         self.nb_individuals  = nb_individuals
@@ -33,6 +33,10 @@ class GeneticProgramming:
             'functions': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply ],
             'terminals': [ tree.Value, tree.Variable ]
         }
+
+        if (allow_sin):
+            self.node_list['terminals'].append(tree.Sin)
+            self.node_list['terminals'].append(tree.Cos)
 
     def _init_population(self):
         population = []
@@ -232,11 +236,12 @@ class GeneticProgramming:
             scores['Train']['Best Individiual'] = best_individual.tree.__str__()
             
             if (gen_i == self.nb_generations-1):
-                fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
+                fitness_test = self._fitness([best_individual], self.X_test, self.y_test, substitute_fitness=False)
                 fitness_test = np.array(fitness_test)
-                # fitness_test = fitness_test[fitness_test < np.percentile(fitness_test, 99)]
-                # for i in range(0, 5):
-                #     fitness_test = fitness_test[fitness_test != np.max(fitness_test)]
+                if (np.mean(fitness_test) > 4):
+                    fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
+                fitness_test = np.array(fitness_test)
+
                 scores['Test']['Average'].append(np.mean(fitness_test) )
                 scores['Test']['Best'].append(np.min(fitness_test))
 

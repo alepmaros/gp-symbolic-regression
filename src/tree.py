@@ -240,9 +240,6 @@ class Sin(Terminal):
         self.value = rng.randint(0, n_features)
 
     def eval(self, X):
-        if (self.left == None or self.right == None):
-            raise Exception('Left or Right value not set for Division')
-        
         return np.sin(X[:,self.value])
 
     def __str__(self):
@@ -262,9 +259,6 @@ class Cos(Terminal):
         self.value = rng.randint(0, n_features)
 
     def eval(self, X):
-        if (self.left == None or self.right == None):
-            raise Exception('Left or Right value not set for Division')
-        
         return np.cos(X[:,self.value])
 
     def __str__(self):

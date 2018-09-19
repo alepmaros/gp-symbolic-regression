@@ -18,6 +18,7 @@ def gp_run(scores_list, train, test, args, seed):
                             args.max_tree_depth,
                             args.tournament_size,
                             args.elitist_operators,
+                            args.allow_sin,
                             rng)
     scores = gp.run()
     scores_list.append(scores)
@@ -45,6 +46,8 @@ if __name__ == '__main__':
                         help='How many individuals will be selected in the tournament')
     parser.add_argument('--elitist-operators', action='store_true',
                         help='If Elitist operators are enabled')
+    parser.add_argument('--allow-sin', action='store_true',
+                        help='Allow sin or cossine functions')
     parser.add_argument('--random-seed', type=int, default=random.randint(0,1000000),
                         help='The seed for the random number generator')
     parser.add_argument('--timestamp', type=str, default=str(time.time()).split('.')[0],
@@ -88,7 +91,8 @@ if __name__ == '__main__':
             'Max Tree Depth': args.max_tree_depth,
             'Tournament Size': args.tournament_size,
             'Random Seed': args.random_seed,
-            'Elitist Operators': args.elitist_operators
+            'Elitist Operators': args.elitist_operators,
+            'Allow Sin': args.allow_sin
         }
     }
 
@@ -104,16 +108,16 @@ if __name__ == '__main__':
     #                             args.max_tree_depth,
     #                             args.tournament_size,
     #                             args.elitist_operators,
+    #                             args.allow_sin,
     #                             new_rng)
     #     scores = gp.run()
     #     all_runs['scores'].append(scores)
 
-    pool = mp.Pool(7)
+    pool = mp.Pool(8)
     processes = []
     with mp.Manager() as manager:
         scores = manager.list()
         for i in range(0, args.runs):
-            print('seed', run_seeds[i])
             pool.apply_async(gp_run,
                 args=(scores, train, test, args, run_seeds[i]))
         pool.close()
