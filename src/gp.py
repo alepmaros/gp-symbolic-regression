@@ -207,14 +207,43 @@ class GeneticProgramming:
                     son1, son2 = self._crossover(ind1, ind2)
                     self._fitness([son1, son2], self.X_train, self.y_train)
 
-                    new_population.append(son1)
-                    new_population.append(son2)
+                    if (not self.elitist_operators):
+                        new_population.append(son1)
+                        new_population.append(son2)
+                    else:
+                        add_better_parent = True
+                        if (son1.fitness <= ind1.fitness and son1.fitness <= ind2.fitness):
+                            new_population.append(son1)
+                            add_better_parent = False
+                        
+                        if (son2.fitness <= ind1.fitness and son2.fitness <= ind2.fitness):
+                            new_population.append(son2)
+                            add_better_parent = False
+
+                        if (add_better_parent):
+                            if (ind1.fitness <= ind2.fitness):
+                                copy_indi = copy.deepcopy(ind1)
+                                self._fitness([copy_indi], self.X_train, self.y_train)
+                                new_population.append(copy_indi)
+                            else:
+                                copy_indi = copy.deepcopy(ind2)
+                                self._fitness([copy_indi], self.X_train, self.y_train)
+                                new_population.append(copy_indi)
+
                 elif (choice == 'mutation'):
                     # Do Mutation
                     individual = self._tournament(population)
                     mutated_individual = self._mutation(individual)
                     self._fitness([mutated_individual], self.X_train, self.y_train)
-                    new_population.append(mutated_individual)
+                    if (not self.elitist_operators):
+                        new_population.append(mutated_individual)
+                    else:
+                        if (mutated_individual.fitness <= individual.fitness):
+                            new_population.append(mutated_individual)
+                        else:
+                            copy_indi = copy.deepcopy(individual)
+                            self._fitness([copy_indi], self.X_train, self.y_train)
+                            new_population.append(copy_indi)
                 else:
                     reproduct = self._tournament(population)
                     new_population.append(reproduct)
