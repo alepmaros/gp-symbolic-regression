@@ -130,7 +130,7 @@ if __name__ == '__main__':
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
 
-    file_name = 'scores_{}_pop{}_gen{}_cross{}_mut{}_repro{}_mtd{}_k{}_eli{}_seed{}.json'.format(
+    file_name = 'scores_{}_pop{}_gen{}_cross{}_mut{}_repro{}_mtd{}_k{}_eli{}_sin{}_seed{}.json'.format(
         args.dataset,
         args.population,
         args.generations,
@@ -140,6 +140,7 @@ if __name__ == '__main__':
         args.max_tree_depth,
         args.tournament_size,
         args.elitist_operators,
+        args.allow_sin,
         args.random_seed
     )
 

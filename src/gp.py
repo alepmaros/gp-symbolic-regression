@@ -29,14 +29,15 @@ class GeneticProgramming:
         self.n_features     = len(self.X_train[0])
 
         self.node_list = {
-            'all': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply, tree.Value, tree.Variable ],
-            'functions': [ tree.Sum, tree.Division, tree.Subtraction, tree.Multiply ],
+            'all': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply, tree.Value, tree.Variable ],
+            'functions': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply ],
             'terminals': [ tree.Value, tree.Variable ]
         }
 
         if (allow_sin):
+            self.node_list['all'].append(tree.Sin)
             self.node_list['terminals'].append(tree.Sin)
-            self.node_list['terminals'].append(tree.Cos)
+            # self.node_list['terminals'].append(tree.Cos)
 
     def _init_population(self):
         population = []
@@ -61,8 +62,8 @@ class GeneticProgramming:
 
         # print(len(population))
         # for i, p in enumerate(population):
-        #     print(i, p.tree.getMaxDepth())
-        # input()
+        #     print(i, p.tree)
+        #     input()
 
         return population
 
@@ -70,7 +71,7 @@ class GeneticProgramming:
         # Generate a list of numbers from 0 to len(population)
         index_individuals = np.arange(len(population))
         # Shuffle the list
-        np.random.shuffle(index_individuals)
+        self.rng.shuffle(index_individuals)
         # Select the individuals that are selected
         index_individuals = index_individuals[:self.tournament_size]
         # Create a new list with this individuals
@@ -256,7 +257,7 @@ class GeneticProgramming:
                     best_individual = p
                 fitness_train.append(p.fitness)
             fitness_train = np.array(fitness_train)
-            fitness_train = fitness_train[fitness_train < 3.0]
+            fitness_train = fitness_train[fitness_train < 5.0]
             # for i in range(0, 5):
             #     fitness_train = fitness_train[fitness_train != np.max(fitness_train)]
 

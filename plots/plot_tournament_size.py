@@ -1,4 +1,6 @@
 import json,csv,time,os,sys,argparse
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -37,7 +39,7 @@ for i, scores_path in enumerate(args.scores):
         #         np.mean(scores_train_avg, axis=0) + np.std(scores_train_avg, axis=0),
         #         alpha=0.3, color=available_colors[i])
 
-        plt.title('Fitness Média para dados de Treino')
+        plt.title('{} Fitness Média para dados de Treino\nVariação do $k$'.format(args.dataset))
         plt.xlabel('Geração')
         plt.ylabel('Fitness')
         plt.legend()
@@ -75,7 +77,7 @@ for i, scores_path in enumerate(args.scores):
 
 ax0.boxplot(list_scores_test)
 ax0.set_xticklabels(xtick_labels, rotation=15)
-ax0.set_title('Fitness do melhor indivíduo na última geração\npara base de Treino')
+ax0.set_title('{} - Fitness do melhor indivíduo na última\ngeração para base de Treino'.format(args.dataset))
 
 # Best Individual Test
 xtick_labels = []
@@ -93,14 +95,7 @@ for i, scores_path in enumerate(args.scores):
 
 ax1.boxplot(list_scores_test)
 ax1.set_xticklabels(xtick_labels, rotation=15)
-ax1.set_title('Fitness do melhor indivíduo na última geração\npara base de Teste')
-
-
-# save_path, _ = os.path.split(args.scores[0])
-# save_path = os.path.join(save_path, '{}_operators_prob_best_test.pdf'.format(args.dataset))
-# plt.tight_layout()
-# plt.savefig(save_path, format='pdf')
-
+ax1.set_title('{} - Fitness do melhor indivíduo na última\ngeração para base de Teste'.format(args.dataset))
 
 save_path, _ = os.path.split(args.scores[0])
 save_path = os.path.join(save_path, '{}_tournament_size_best.pdf'.format(args.dataset))

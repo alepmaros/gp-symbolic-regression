@@ -101,7 +101,7 @@ class Sum(Function):
         return np.add(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
-        return '(+ {} {})'.format(self.left.__str__(), self.right.__str__())
+        return '({} + {})'.format(self.left.__str__(), self.right.__str__())
 
     def __deepcopy__(self, memodict={}):
         copy_object = Sum(None, self.n_features, self.rng)
@@ -123,7 +123,7 @@ class Multiply(Function):
         return np.multiply(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
-        return '(* {} {})'.format(self.left.__str__(), self.right.__str__())
+        return '({} * {})'.format(self.left.__str__(), self.right.__str__())
 
     def __deepcopy__(self, memodict={}):
         copy_object = Multiply(None, self.n_features, self.rng)
@@ -145,7 +145,7 @@ class Subtraction(Function):
         return np.subtract(self.left.eval(X), self.right.eval(X))
 
     def __str__(self):
-        return '(- {} {})'.format(self.left.__str__(), self.right.__str__())
+        return '({} - {})'.format(self.left.__str__(), self.right.__str__())
 
     def __deepcopy__(self, memodict={}):
         copy_object = Subtraction(None, self.n_features, self.rng)
@@ -165,13 +165,13 @@ class Division(Function):
             raise Exception('Left or Right value not set for Division')
         
         with np.errstate(divide='ignore', invalid='ignore'):
-            result = np.true_divide(self.left.eval(X), self.right.eval(X))
+            result = np.true_divide(self.left.eval(X), np.round(self.right.eval(X), 2))
             result[np.isinf(result)] = 1
             result[np.isnan(result)] = 1
             return result
 
     def __str__(self):
-        return '(/ {} {})'.format(self.left.__str__(), self.right.__str__())
+        return '({} / {})'.format(self.left.__str__(), self.right.__str__())
 
     def __deepcopy__(self, memodict={}):
         copy_object = Division(None, self.n_features, self.rng)
@@ -198,7 +198,7 @@ class Terminal(Node):
 class Value(Terminal):
     def __init__(self, parent, n_features, rng):
         super().__init__(parent, n_features, rng)
-        self.value = round(rng.uniform(-2, 2), 3)
+        self.value = round(rng.uniform(-2, 2), 2)
 
     def eval(self, X):
         return np.full(X.shape[0], self.value)
@@ -224,7 +224,7 @@ class Variable(Terminal):
         return X[:,self.value]
 
     def __str__(self):
-        return 'X[{}]'.format(self.value)
+        return 'X{}'.format(self.value)
 
     def __deepcopy__(self, memodict={}):
         copy_object = Variable(None, self.n_features, self.rng)
@@ -243,7 +243,7 @@ class Sin(Terminal):
         return np.sin(X[:,self.value])
 
     def __str__(self):
-        return '(sin X[{}])'.format(self.value)
+        return '(sin(X{}))'.format(self.value)
 
     def __deepcopy__(self, memodict={}):
         copy_object = Sin(None, self.n_features, self.rng)
@@ -262,7 +262,7 @@ class Cos(Terminal):
         return np.cos(X[:,self.value])
 
     def __str__(self):
-        return '(cos {})'.format(self.left.__str__())
+        return '(cos(X{}))'.format(self.value)
 
     def __deepcopy__(self, memodict={}):
         copy_object = Cos(None, self.n_features, self.rng)
