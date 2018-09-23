@@ -96,7 +96,7 @@ if __name__ == '__main__':
         }
     }
 
-
+    # Serial Run, for debugging
     # for i in range(0, args.runs):
     #     new_rng = np.random.RandomState(seed=run_seeds[i])
     #     gp = GeneticProgramming(train, test,
@@ -113,7 +113,8 @@ if __name__ == '__main__':
     #     scores = gp.run()
     #     all_runs['scores'].append(scores)
 
-    pool = mp.Pool(8)
+    # Parallel Run
+    pool = mp.Pool(6)
     processes = []
     with mp.Manager() as manager:
         scores = manager.list()
