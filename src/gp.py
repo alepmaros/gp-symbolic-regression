@@ -143,7 +143,8 @@ class GeneticProgramming:
             'Train': {
                 'Best': [],
                 'Average': [],
-                'Worst': []
+                'Worst': [],
+                'Different Individuals': []
             },
             'Test': {
                 'Best': [],
@@ -233,6 +234,7 @@ class GeneticProgramming:
             scores['Train']['Average'].append(np.mean(fitness_train) )
             scores['Train']['Best'].append(np.min(fitness_train))
             scores['Train']['Best Individual'] = best_individual.tree.__str__()
+            scores['Train']['Different Individuals'].append(self._count_distinc_individuals(new_population))
             
             # Calculate the fitness on the train set
             if (gen_i == self.nb_generations-1):
@@ -253,3 +255,11 @@ class GeneticProgramming:
 
         # Returns fitness of every individual at generation i for train and test set
         return scores
+
+    def _count_distinc_individuals(self, population):
+        individuals = []
+        for p in population:
+            ind = p.tree.__str__()
+            if ind not in individuals:
+                individuals.append(ind)
+        return len(individuals)

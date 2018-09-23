@@ -57,6 +57,8 @@ f3=$(python3 run.py -d synth1 -g 200 -k 7 -p 100 -r 30 -cp 0.7 -mp 0.29 -rp 0.01
 
 python3 plots/plot_tournament_size.py --scores $f1 $f2 $f3 --dataset synth1
 
+python3 plots/plot_different_individuals.py --scores $f1 $f2 $f3 --dataset synth1 --individual 100
+
 # Elists on Synth 1
 echo "Running Without Elitist Operators"
 f1=$(python3 run.py -d synth1 -g 200 -k 2 -p 100 -r 30 -cp 0.7 -mp 0.29 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test elitist_operators | tail -1)
@@ -108,15 +110,14 @@ python3 plots/plot_avg_best.py --scores $f1 --dataset synth2
 #################################
 #################################
 
-echo "Concrete"
+# echo "Concrete"
 echo "Running with not allow sin"
 f1=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
 echo "Running with allow sin"
 f2=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
 
-python3 plots/plot_sin.py --scores $f1 $f2 --dataset concrete
+python3 plots/plot_sin.py --scores $f1 --dataset concrete
 
-# # Operator Probabilities on Concrete
 echo "Running operator Probability 1"
 f1=$(python3 run.py -d concrete -g 500 -k 2 -p 100 -r 40 -cp 0.9 -mp 0.09 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test operator_prob | tail -1)
 echo "Running operator Probability 2"
@@ -135,6 +136,8 @@ echo "Running Tournament Size 7"
 f3=$(python3 run.py -d concrete -g 500 -k 7 -p 100 -r 30 -cp 0.7 -mp 0.29 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test tournament_size | tail -1)
 
 python3 plots/plot_tournament_size.py --scores $f1 $f2 $f3 --dataset concrete
+
+python3 plots/plot_different_individuals.py --scores $f1 $f2 $f3 --dataset concrete --individual 100
 
 # Best, Average Concrete
 echo "Best Average on Concrete"
