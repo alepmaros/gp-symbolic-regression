@@ -27,7 +27,7 @@ for i, scores_path in enumerate(args.scores):
         
         crossover_proability = score['Parameters']['Crossover Probability']
         mutation_probability = score['Parameters']['Mutation Probability']
-        label = r'$p_c$ = {}% - $p_m$ = {}%'.format(crossover_proability, mutation_probability)
+        label = r'$p_c$ = {} - $p_m$ = {}'.format(crossover_proability, mutation_probability)
 
         scores_train_avg = [ x['Train']['Average'] for x in score['scores'] ]
 
@@ -71,7 +71,7 @@ for i, scores_path in enumerate(args.scores):
         
         crossover_proability = score['Parameters']['Crossover Probability']
         mutation_probability = score['Parameters']['Mutation Probability']
-        label = '$p_c$ {}% $p_m$ {}%'.format(crossover_proability, mutation_probability)
+        label = '$p_c$ {} $p_m$ {}'.format(crossover_proability, mutation_probability)
         
         scores_train_best = [ x['Train']['Best'][-1] for x in score['scores'] ]
         list_scores_test.append(np.ravel(scores_train_best[:-1]))
@@ -91,7 +91,7 @@ for i, scores_path in enumerate(args.scores):
         
         crossover_proability = score['Parameters']['Crossover Probability']
         mutation_probability = score['Parameters']['Mutation Probability']
-        label = '$p_c$ {}% $p_m$ {}%'.format(crossover_proability, mutation_probability)
+        label = '$p_c$ {} $p_m$ {}'.format(crossover_proability, mutation_probability)
         
         scores_test_best = [ x['Test']['Best'] for x in score['scores'] ]
         list_scores_test.append(np.ravel(scores_test_best))
