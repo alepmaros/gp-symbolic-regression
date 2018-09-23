@@ -35,8 +35,8 @@ class GeneticProgramming:
         }
 
         if (allow_sin):
-            self.node_list['all'].append(tree.Sin)
-            self.node_list['terminals'].append(tree.Sin)
+            # self.node_list['all'].append(tree.Sin)
+            # self.node_list['terminals'].append(tree.Sin)
             self.node_list['all'].append(tree.Cos)
             self.node_list['terminals'].append(tree.Cos)
 

@@ -82,28 +82,28 @@ SEED=8141516
 
 # Allow Sin
 echo "Running with not allow sin"
-f1=$(python3 run.py -d synth2 -g 500 -k 2 -p 200 -r 30 -cp 0.5 -mp 0.49 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
+f1=$(python3 run.py -d synth2 -g 1000 -k 5 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
 echo "Running with allow sin"
-f2=$(python3 run.py -d synth2 -g 500 -k 2 -p 200 -r 30 -cp 0.5 -mp 0.49 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
+f2=$(python3 run.py -d synth2 -g 1000 -k 5 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
 
 python3 plots/plot_sin.py --scores $f1 $f2 --dataset synth2
 
 # Best, Average Synth 2
 echo "Best Average on Synth 2"
-f1=$(python3 run.py -d synth1 -g 500 -k 2 -p 200 -r 30 -cp 0.5 -mp 0.49 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test best_avg | tail -1)
+f1=$(python3 run.py -d synth2 -g 1000 -k 5 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test best_avg | tail -1)
 
 python3 plots/plot_avg_best.py --scores $f1 --dataset synth2
 
 # Concrete
-echo "Concrete"
-echo "Running with not allow sin"
-f1=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
-echo "Running with allow sin"
-f2=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
+# echo "Concrete"
+# echo "Running with not allow sin"
+# f1=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
+# echo "Running with allow sin"
+# f2=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test allow_sin | tail -1)
 
-python3 plots/plot_sin.py --scores $f1 $f2 --dataset concrete
+# python3 plots/plot_sin.py --scores $f1 $f2 --dataset concrete
 
-echo "Best Average on Synth 2"
-f1=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test best_avg | tail -1)
+# echo "Best Average on Synth 2"
+# f1=$(python3 run.py -d concrete -g 500 -k 2 -p 200 -r 30 -cp 0.9 -mp 0.09 -rp 0.01 --allow-sin --random-seed $SEED --timestamp $TIMESTAMP --test best_avg | tail -1)
 
 python3 plots/plot_avg_best.py --scores $f1 --dataset concrete
