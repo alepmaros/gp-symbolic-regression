@@ -29,23 +29,23 @@ class GeneticProgramming:
         self.n_features     = len(self.X_train[0])
 
         self.node_list = {
-            'all': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply, tree.Value, tree.Variable ],
+            'all': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply, tree.Value, tree.Variable, tree.Variable, tree.Variable ],
             'functions': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply ],
             'terminals': [ tree.Value, tree.Variable ]
         }
 
         if (allow_sin):
-            # self.node_list['all'].append(tree.Sin)
-            # self.node_list['terminals'].append(tree.Sin)
-            self.node_list['all'].append(tree.Cos)
-            self.node_list['terminals'].append(tree.Cos)
+            self.node_list = {
+                'all': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply, tree.Value, tree.Variable, tree.Variable, tree.Sin ],
+                'functions': [ tree.Sum, tree.Subtraction, tree.Division, tree.Multiply ],
+                'terminals': [ tree.Value, tree.Variable, tree.Sin ]
+            }
 
     def _init_population(self):
         population = []
         individuals_per_level = self.nb_individuals / self.max_tree_depth
         
         # Create 1/2 using Grow and 1/2 using Full
-        
         for max_depth in range(1, self.max_tree_depth+1):
             for j in range (0, int(individuals_per_level / 2)):
                 indi_grow = Individual(self.max_tree_depth, self.n_features)
@@ -60,11 +60,6 @@ class GeneticProgramming:
             indi_grow = Individual(self.max_tree_depth, self.n_features)
             indi_grow.grow(self.node_list, self.rng, 0, self.max_tree_depth)
             population.append(indi_grow)
-
-        # print(len(population))
-        # for i, p in enumerate(population):
-        #     print(i, p.tree)
-        #     input()
 
         return population
 
@@ -111,30 +106,12 @@ class GeneticProgramming:
             random_node_1 = son1.select_random_node(self.rng)
             random_node_2 = son2.select_random_node(self.rng)
         
-        # if (random_node_1['cur_depth'] + random_node_2['node_depth'] <= self.max_tree_depth):
         self._swap_nodes( copy.deepcopy(random_node_2['node']), random_node_1['node'] )
-
-        # if (random_node_2['cur_depth'] + random_node_1['node_depth'] <= self.max_tree_depth):
         self._swap_nodes( copy.deepcopy(random_node_1['node']), random_node_2['node'] )
 
-
-        # if (son1.tree.getMaxDepth() > 6):
-        #     print(son1.tree.getMaxDepth())
-        #     print(son1.tree)
-        #     print(random_node_1)
-        #     print(random_node_2)
-        #     input()
-
-        # print('ind1', ind1.tree)
-        # print('ind2', ind2.tree)
-        # print('son1', son1.tree)
-        # print('son2', son2.tree)
-        # input()
-    
         return son1, son2
 
     def _mutation(self, individual):
-        # print('indi1', individual.tree)
         new_individual = copy.deepcopy(individual)
         new_individual.fitness = None
 
@@ -144,32 +121,18 @@ class GeneticProgramming:
         sub_tree.grow(self.node_list, self.rng, random_node['cur_depth'], self.max_tree_depth)
         
         mutated_node = copy.deepcopy(sub_tree.tree.root)
-        # print('mutaded_node', mutated_node)
 
         self._swap_nodes(mutated_node, random_node['node'])
 
-        # print('indi1', individual.tree)
-        # print('new', new_individual.tree)
-        # input()
-
-        # new_individual.node_list = None
         return new_individual
 
     def _fitness(self, population, X, y, substitute_fitness=True):
         normalization = np.sum( np.power(y - np.mean(y), 2))
-        # normalization = np.std(self.y_train)
+
         fitness_list = []
         for p in population:
             y_pred = p.predict(X)
-            # print(y_pred)
-            error = np.sqrt(np.sum(np.power(y - y_pred, 2)) / normalization) #* ( (p.tree.getMaxDepth() / 6))
-            # print(error)
-            # print(y_pred)
-            # print(self.y_train)
-            # print(y_pred-self.y_train)
-            # print(np.power(y_pred - self.y_train, 2))
-            # input()
-            # error = np.sqrt(np.sum(np.power(y_pred - self.y_train, 2)) / len(y_pred))
+            error = np.sqrt(np.sum(np.power(y - y_pred, 2)) / normalization)
             fitness_list.append(error)
             if (substitute_fitness):
                 p.fitness = error
@@ -180,7 +143,8 @@ class GeneticProgramming:
             'Train': {
                 'Best': [],
                 'Average': [],
-                'Worst': []
+                'Worst': [],
+                'Different Individuals': []
             },
             'Test': {
                 'Best': [],
@@ -194,8 +158,6 @@ class GeneticProgramming:
         self._fitness(population, self.X_train, self.y_train)
 
         for gen_i in range(0, self.nb_generations):
-            # if (gen_i % 50 == 0):
-            #     print('Generation', gen_i)
             new_population = []
             while ( len(new_population) < self.nb_individuals ):
                 
@@ -251,6 +213,7 @@ class GeneticProgramming:
                     new_population.append(reproduct)
                     # print('hi')
 
+            # Saving fitness for new population
             fitness_train = []
             best_individual = new_population[0]
             for p in new_population:
@@ -259,8 +222,6 @@ class GeneticProgramming:
                 fitness_train.append(p.fitness)
             fitness_train = np.array(fitness_train)
             fitness_train = fitness_train[fitness_train < 5.0]
-            # for i in range(0, 5):
-            #     fitness_train = fitness_train[fitness_train != np.max(fitness_train)]
 
             # if (gen_i % 50 == 0):
             #     sizes = []
@@ -273,7 +234,9 @@ class GeneticProgramming:
             scores['Train']['Average'].append(np.mean(fitness_train) )
             scores['Train']['Best'].append(np.min(fitness_train))
             scores['Train']['Best Individual'] = best_individual.tree.__str__()
+            scores['Train']['Different Individuals'].append(self._count_distinc_individuals(new_population))
             
+            # Calculate the fitness on the train set
             if (gen_i == self.nb_generations-1):
                 # k_individuals = self._select_k_best_individuals(new_population, k=50)
                 fitness_test = self._fitness(new_population, self.X_test, self.y_test, substitute_fitness=False)
@@ -290,10 +253,13 @@ class GeneticProgramming:
                 scores['Test']['Best Individual From Train'] = score_best_individual_train[0]
             population = new_population
 
-        # plt.plot(scores['Train'])
-        # plt.show()
-
-        # Fitness
-
         # Returns fitness of every individual at generation i for train and test set
         return scores
+
+    def _count_distinc_individuals(self, population):
+        individuals = []
+        for p in population:
+            ind = p.tree.__str__()
+            if ind not in individuals:
+                individuals.append(ind)
+        return len(individuals)

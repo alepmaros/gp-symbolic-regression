@@ -34,10 +34,10 @@ for i, scores_path in enumerate(args.scores):
             np.mean(scores_train_avg, axis=0), available_lines[i],
             label=label)
 
-        # plt.fill_between(np.arange(0,len(scores_train_avg[0])),
-        #         np.mean(scores_train_avg, axis=0) - np.std(scores_train_avg, axis=0),
-        #         np.mean(scores_train_avg, axis=0) + np.std(scores_train_avg, axis=0),
-        #         alpha=0.3, color=available_colors[i])
+        plt.fill_between(np.arange(0,len(scores_train_avg[0])),
+                np.mean(scores_train_avg, axis=0) - np.std(scores_train_avg, axis=0),
+                np.mean(scores_train_avg, axis=0) + np.std(scores_train_avg, axis=0),
+                alpha=0.3, color=available_colors[i])
 
         plt.title('{} - Fitness Média para dados de Treino\nVariação de número de gerações'.format(args.dataset))
         plt.xlabel('Geração')
